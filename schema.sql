@@ -29,7 +29,7 @@ CREATE TABLE `mod_attached_files` (
 	`set_new_version_on_approval` TINYINT(1) NOT NULL DEFAULT '0',
 	`rejection_reason` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
 	`judged_timestamp` DATETIME NULL DEFAULT NULL,
-	`virustotal_analyses_id` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
+	`virustotal_analyses_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
 	`submitted_timestamp` DATETIME NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
