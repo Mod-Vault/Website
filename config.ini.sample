@@ -4,6 +4,7 @@
 [globals]
 
 ; PROJECT SETTINGS
+websiteName = "ModVault"
 defaultModule = "discover"
 defaultTemplate = "templates/main"
 

@@ -33,9 +33,9 @@
     <h2 class="ui header">
         {{ @data['info']['name'] }}
         <check if="{{ !empty(@data['files']['current']) }}">
-            <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
+            <div class="sub header">Current Version: {{ @data['files']['current']['version'] }}</div>
         </check>
-        <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
+        <div class="sub header">Added By <a target="_blank" href="mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
     </h2>
 
     <div id="details_submenu" class="ui top attached tabular menu">
@@ -113,10 +113,10 @@
             <check if="{{ !empty(@data['files']['current'] )}}">
                 <div class="active title">
                     <i class="dropdown icon"></i>
-                    Current Version - {{ @data[files][current][version] }}
+                    Current Version - {{ @data['files']['current']['version'] }}
                 </div>
                 <div class="active content">
-                    <a href="/mods/download?file_id={{ @data['files']['current']['uid'] }}" class="ui green button">Download Latest Version</a>
+                    <a href="mods/download?file_id={{ @data['files']['current']['uid'] }}" class="ui green button">Download Latest Version</a>
                     <check if="{{ !empty(@data['changelogs'][@data['files']['current']['version']]) }}">
                         <h3>Changelog</h3>
                         <ul>
@@ -134,7 +134,7 @@
                         Other Version - {{ @file['version'] }}
                     </div>
                     <div class="content">
-                        <a href="/mods/download?file_id={{ @file['uid'] }}" class="ui green button">Download Other Version</a>
+                        <a href="mods/download?file_id={{ @file['uid'] }}" class="ui green button">Download Other Version</a>
                         <check if="{{ !empty(@data['changelogs'][@file['version']]) }}">
                             <h3>Changelog</h3>
                             <ul>

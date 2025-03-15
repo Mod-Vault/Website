@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Access For All</title>
+		<title>{{ @websiteName }}</title>
 
 		<base href="{{ @basePath }}">
 
@@ -54,8 +54,8 @@
 			<div class="ui container">
 				<a href="" class="header item">
 					<!-- <img class="logo" src="assets/images/logo.png"> -->
-					<i class="universal access large icon"></i>
-					Access For All
+					<i class="archive large icon"></i>
+					<span style="font-size: 18px">{{ @websiteName }}</span>
 				</a>
 				{{ (require('app/application/menu.php')) == -1 ? '' : '' }}
 				<div class="right menu">

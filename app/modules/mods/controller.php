@@ -140,8 +140,6 @@ class controller extends \Controller {
 
 	function download() {
 
-		echo "<title>Download File - A4A</title>";
-
 		$file_id = $_GET['file_id'];
 		if(empty($file_id)) die('No File ID given...');
 
