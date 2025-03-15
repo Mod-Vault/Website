@@ -1,0 +1,214 @@
+<style>
+    img {
+        float: left !important;
+        width:  100% !important;
+        height: 200px !important;
+        object-fit: contain !important;
+    }
+    .ui.menu:not(#site_main_menu) {
+        border-bottom: 1px solid white !important;
+        padding-top: 2px;
+    }
+    .sub.header {
+        color: inherit !important;
+    }
+    #details_submenu.ui.menu .item:not(.active) {
+        background-color: #1b1c1d;
+        color: white;
+    }
+    #details_submenu.ui.menu .item.active {
+        background-color: #3d3e3f;
+        color: white;
+    }
+
+    #viewer ul li p {
+        margin-bottom: 0px;
+    }
+</style>
+
+<set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
+
+<div class="ui primary segment">
+    <div class="ui buttons">
+        <check if="{{ @a4a_referer }}">
+            <true>
+                <a href="{{ @_SERVER['HTTP_REFERER'] }}" class="ui primary button">Go Back</a>
+            </true>
+            <false>
+                <a href="/mods?game_id={{ @data[game_info][uid] }}" class="ui primary button">View More for {{ @data[game_info][name] }}</a>
+            </false>
+        </check>
+    </div>
+</div>
+
+<div class="ui white segment">
+
+    <h2 class="ui header">
+        {{ @data[info][name] }}
+        <check if="{{ !empty(@data[files][current]) }}">
+            <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
+        </check>
+        <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+    </h2>
+
+    <div id="details_submenu" class="ui top attached tabular menu">
+        <a class="item active" data-tab="information">Information</a>
+        <check if="{{ !empty(@data[files][current]) || @is_owner }}">
+            <a class="item" data-tab="downloads">Downloads</a>
+        </check>
+        <check if="{{ !empty(@data[changelogs]) }}">
+            <a class="item" data-tab="changelogs">Changelogs</a>
+        </check>
+    </div>
+    <div class="ui bottom attached tab segment inverted active" data-tab="information">
+        <div class="ui white segment">
+
+            <h3>
+                Description
+                <check if="{{ @is_owner }}">
+                    <button id="edit_description_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+
+          <div id="viewer"></div>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+        <div class="ui white segment">
+
+            <h3>
+                Other Links
+                <check if="{{ @is_owner }}">
+                    <button id="edit_attached_links_button" class="ui mini green button">Edit</button>
+                </check>
+            </h3>
+
+            <ul>
+                <repeat group="{{ @data[links] }}" value="{{ @nfo }}">
+                    <li><a target="_blank" href="{{ @nfo[href] }}">{{ @nfo[description] }}</a></li>
+                </repeat>
+            </ul>
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+    </div>
+    <div class="ui bottom attached tab inverted segment" data-tab="changelogs">
+        <div class="ui white segment">
+
+            <h2>Changelogs</h2>
+
+            <div class="ui styled fluid accordion" style="color: black;">
+                <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Version {{ @version }}
+                    </div>
+                    <div class="content">
+                        <ul>
+                            <repeat group="{{ @logs }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </div>
+                </repeat>
+            </div>
+
+
+            <ul>
+                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                    <li>{{ @log }}</li>
+                </repeat>
+            </ul>
+
+
+            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
+        </div>
+    </div>
+    <div class="ui bottom attached tab inverted segment" data-tab="downloads">
+
+        <check if="{{ @is_owner }}">
+            <div class="ui primary segment">
+                <button id="add_new_version_button"  class="ui primary button">New Version</button>
+                <button id="change_current_version_button" class="ui secondary button">Change Current Version</button>
+                <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
+                <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
+            </div>
+        </check>
+
+        <div class="ui styled fluid accordion" style="color: black;">
+
+            <check if="{{ !empty(@data[files][current] )}}">
+                <div class="active title">
+                    <i class="dropdown icon"></i>
+                    Current Version - {{ @data[files][current][version] }}
+                </div>
+                <div class="active content">
+                    <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
+                    <check if="{{ !empty(@data[changelogs][@data[files][current][version]]) }}">
+                        <h3>Changelog</h3>
+                        <ul>
+                            <repeat group="{{ @data[changelogs][@data[files][current][version]] }}" value="{{ @log }}">
+                                <li>{{ @log }}</li>
+                            </repeat>
+                        </ul>
+                    </check>
+                </div>
+            </check>
+            <check if="{{ !empty(@data[files][other]) }}">
+                <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Other Version - {{ @file[version] }}
+                    </div>
+                    <div class="content">
+                        <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Other Version</a>
+                        <check if="{{ !empty(@data[changelogs][@file[version]]) }}">
+                            <h3>Changelog</h3>
+                            <ul>
+                                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                                    <li>{{ @log }}</li>
+                                </repeat>
+                            </ul>
+                        </check>
+                    </div>
+                </repeat>
+            </check>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+
+        var viewer = $('#viewer');
+        viewer.html(editor.getHTML());
+
+        //dynamically add table styling from generated markdown html
+        viewer.find('table').addClass('ui striped compact celled sortable inverted table');
+        viewer.find('a').each(function(index, value) {
+
+            const tmp = document.createElement('a');
+            tmp.href = value.href;
+
+            if(tmp.host !== window.location.host) {
+                $(this).attr('target', '_blank');
+            }
+
+        });
+        viewer.find(':header').each(function(index, value) {
+
+            var text = this.innerText;
+
+            var slug = text.toLowerCase()
+                           .trim()
+                           .replace(/[^\w\s-]/g, '')
+                           .replace(/[\s_-]+/g, '-')
+                           .replace(/^-+|-+$/g, '');
+
+            $(this).attr('id', slug);
+
+        });
+
+    });
+</script>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Access For All</title>
+
+		<!-- <link rel="icon" href="img/favicon.ico"> -->
+		<!-- CSS/JS FILES -->
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+
+		<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+		<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.address/1.6/jquery.address.min.js" integrity="sha512-Fhm8fcAQhENO1HmU1JjbnNm6ReszFIiJvkHdnuGZBznaaM6vakH4YEPO7v8M3PbGR03R/dur0QP5vZ5s4YaN7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+		<style>
+			div.toastui-editor-main.toastui-editor-md-mode {
+				background-color: #f7f1f1;
+			}
+			div.toastui-editor-md-splitter {
+				background-color: #000;
+			}
+			.ui.toggle.checkbox label:before {
+				 display:block;
+				 position:absolute;
+				 content:'';
+				 z-index:1;
+				 -webkit-transform:none;
+				 transform:none;
+				 border:none;
+				 top:0;
+				 background:rgba(0, 0, 0, 0.25);
+				 -webkit-box-shadow:none;
+				 box-shadow:none;
+				 width:3.5rem;
+				 height:1.5rem;
+				 border-radius:500rem
+			}
+		</style>
+		<script>
+			const Editor = toastui.Editor;
+		</script>
+
+		{{ (require('app/application/theme.php')) == -1 ? '' : '' }}
+
+	</head>
+	<body>
+		<div id="site_main_menu" class="ui fixed inverted menu">
+			<div class="ui container">
+				<a href="/" class="header item">
+					<!-- <img class="logo" src="assets/images/logo.png"> -->
+					<i class="universal access large icon"></i>
+					Access For All
+				</a>
+				{{ (require('app/application/menu.php')) == -1 ? '' : '' }}
+				<div class="right menu">
+				    <!-- <div class="item">
+				      	<div class="ui icon input">
+				        	<input type="text" placeholder="Search...">
+				        	<i class="search link icon"></i>
+				      	</div>
+				    </div> -->
+					<check if="{{ @SESSION.user }}">
+						<true>
+							<div class="ui simple dropdown item">
+								{{ @SESSION.user['display_name'] }} <i class="dropdown icon"></i>
+								<div class="menu">
+									<a class="item" href="/mods/user?user_id={{ @SESSION.user['uid'] }}">My Mods</a>
+									<a class="item" href="/auth/logout">Log Out</a>
+								</div>
+							</div>
+						</true>
+						<false>
+							<a href="/auth" class="ui item">
+						      	Login/Register
+						    </a>
+						</false>
+					</check>
+
+				</div>
+			</div>
+		</div>
+		<div id="site_main_container" class="ui container">
+			<check if="{{ @site_error }}">
+				<div class="ui red message">
+					<h1 class="title">Oof</h1>
+					<p>{{ @site_error }}</p>
+					<i class="close clear icon"></i>
+				</div>
+			</check>
+			<include href="{{ @content }}" />
+		</div>
+	</body>
+
+</html>
+
+<script>
+	$(document).ready(function() {
+
+		$('.menu .item').tab({
+    		history: true,
+    		historyType: 'hash'
+  		});
+        $('.ui.accordion').accordion();
+
+		//adjust main window offset to clear the menu header
+		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 20 + 'px');
+
+		$('.ui.dropdown').dropdown({
+			ignoreDiacritics: true,
+    		sortSelect: true,
+    		fullTextSearch:'exact'
+  		});
+	});
+</script>
