@@ -2,3 +2,4 @@ app/application/tmp/*
 app/application/vendor/fatfree-core-master/*
 uploads/*
 config.ini.php
+error_log
