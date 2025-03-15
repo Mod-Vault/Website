@@ -5,6 +5,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Access For All</title>
 
+		<base href="{{ @basePath }}">
+
 		<!-- <link rel="icon" href="img/favicon.ico"> -->
 		<!-- CSS/JS FILES -->
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
@@ -50,7 +52,7 @@
 	<body>
 		<div id="site_main_menu" class="ui fixed inverted menu">
 			<div class="ui container">
-				<a href="/" class="header item">
+				<a href="" class="header item">
 					<!-- <img class="logo" src="assets/images/logo.png"> -->
 					<i class="universal access large icon"></i>
 					Access For All
@@ -63,18 +65,18 @@
 				        	<i class="search link icon"></i>
 				      	</div>
 				    </div> -->
-					<check if="{{ @SESSION.user }}">
+					<check if="{{ array_key_exists('user', @SESSION) && @SESSION.user }}">
 						<true>
 							<div class="ui simple dropdown item">
 								{{ @SESSION.user['display_name'] }} <i class="dropdown icon"></i>
 								<div class="menu">
-									<a class="item" href="/mods/user?user_id={{ @SESSION.user['uid'] }}">My Mods</a>
-									<a class="item" href="/auth/logout">Log Out</a>
+									<a class="item" href="mods/user?user_id={{ @SESSION.user['uid'] }}">My Mods</a>
+									<a class="item" href="auth/logout">Log Out</a>
 								</div>
 							</div>
 						</true>
 						<false>
-							<a href="/auth" class="ui item">
+							<a href="auth" class="ui item">
 						      	Login/Register
 						    </a>
 						</false>
@@ -84,7 +86,7 @@
 			</div>
 		</div>
 		<div id="site_main_container" class="ui container">
-			<check if="{{ @site_error }}">
+			<check if="{{ isset(@site_error) }}">
 				<div class="ui red message">
 					<h1 class="title">Oof</h1>
 					<p>{{ @site_error }}</p>

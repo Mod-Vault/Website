@@ -26,37 +26,24 @@
     }
 </style>
 
-<set is_owner="{{ @SESSION.user['uid'] == @data[info][owner] || @SESSION.user['is_admin'] == 1 }}"/>
-
-<div class="ui primary segment">
-    <div class="ui buttons">
-        <check if="{{ @a4a_referer }}">
-            <true>
-                <a href="{{ @_SERVER['HTTP_REFERER'] }}" class="ui primary button">Go Back</a>
-            </true>
-            <false>
-                <a href="/mods?game_id={{ @data[game_info][uid] }}" class="ui primary button">View More for {{ @data[game_info][name] }}</a>
-            </false>
-        </check>
-    </div>
-</div>
+<set is_owner="{{ @SESSION.user['uid'] == @data['info']['owner'] || @SESSION.user['is_admin'] == 1 }}"/>
 
 <div class="ui white segment">
 
     <h2 class="ui header">
-        {{ @data[info][name] }}
-        <check if="{{ !empty(@data[files][current]) }}">
+        {{ @data['info']['name'] }}
+        <check if="{{ !empty(@data['files']['current']) }}">
             <div class="sub header">Current Version: {{ @data[files][current][version] }}</div>
         </check>
-        <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data[info][owner] }}">{{ @data[info][author] }}</a></div>
+        <div class="sub header">Added By <a target="_blank" href="/mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
     </h2>
 
     <div id="details_submenu" class="ui top attached tabular menu">
         <a class="item active" data-tab="information">Information</a>
-        <check if="{{ !empty(@data[files][current]) || @is_owner }}">
+        <check if="{{ !empty(@data['files']['current']) || @is_owner }}">
             <a class="item" data-tab="downloads">Downloads</a>
         </check>
-        <check if="{{ !empty(@data[changelogs]) }}">
+        <check if="{{ !empty(@data['changelogs']) }}">
             <a class="item" data-tab="changelogs">Changelogs</a>
         </check>
     </div>
@@ -71,8 +58,6 @@
             </h3>
 
           <div id="viewer"></div>
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
         <div class="ui white segment">
 
@@ -84,12 +69,10 @@
             </h3>
 
             <ul>
-                <repeat group="{{ @data[links] }}" value="{{ @nfo }}">
-                    <li><a target="_blank" href="{{ @nfo[href] }}">{{ @nfo[description] }}</a></li>
+                <repeat group="{{ @data['links'] }}" value="{{ @nfo }}">
+                    <li><a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a></li>
                 </repeat>
             </ul>
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
     </div>
     <div class="ui bottom attached tab inverted segment" data-tab="changelogs">
@@ -112,16 +95,6 @@
                     </div>
                 </repeat>
             </div>
-
-
-            <ul>
-                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
-                    <li>{{ @log }}</li>
-                </repeat>
-            </ul>
-
-
-            <!-- <p>{{ htmlspecialchars_decode(@data[info][description]) }}</p> -->
         </div>
     </div>
     <div class="ui bottom attached tab inverted segment" data-tab="downloads">
@@ -137,35 +110,35 @@
 
         <div class="ui styled fluid accordion" style="color: black;">
 
-            <check if="{{ !empty(@data[files][current] )}}">
+            <check if="{{ !empty(@data['files']['current'] )}}">
                 <div class="active title">
                     <i class="dropdown icon"></i>
                     Current Version - {{ @data[files][current][version] }}
                 </div>
                 <div class="active content">
-                    <a href="/mods/download?file_id={{ @data[files][current][uid] }}" class="ui green button">Download Latest Version</a>
-                    <check if="{{ !empty(@data[changelogs][@data[files][current][version]]) }}">
+                    <a href="/mods/download?file_id={{ @data['files']['current']['uid'] }}" class="ui green button">Download Latest Version</a>
+                    <check if="{{ !empty(@data['changelogs'][@data['files']['current']['version']]) }}">
                         <h3>Changelog</h3>
                         <ul>
-                            <repeat group="{{ @data[changelogs][@data[files][current][version]] }}" value="{{ @log }}">
+                            <repeat group="{{ @data['changelogs'][@data['files']['current']['version']] }}" value="{{ @log }}">
                                 <li>{{ @log }}</li>
                             </repeat>
                         </ul>
                     </check>
                 </div>
             </check>
-            <check if="{{ !empty(@data[files][other]) }}">
-                <repeat group="{{ @data[files][other] }}" value="{{ @file }}">
+            <check if="{{ !empty(@data['files']['other']) }}">
+                <repeat group="{{ @data['files']['other'] }}" value="{{ @file }}">
                     <div class="title">
                         <i class="dropdown icon"></i>
-                        Other Version - {{ @file[version] }}
+                        Other Version - {{ @file['version'] }}
                     </div>
                     <div class="content">
-                        <a href="/mods/download?file_id={{ @file[uid] }}" class="ui green button">Download Other Version</a>
-                        <check if="{{ !empty(@data[changelogs][@file[version]]) }}">
+                        <a href="/mods/download?file_id={{ @file['uid'] }}" class="ui green button">Download Other Version</a>
+                        <check if="{{ !empty(@data['changelogs'][@file['version']]) }}">
                             <h3>Changelog</h3>
                             <ul>
-                                <repeat group="{{ @data[changelogs][@file[version]] }}" value="{{ @log }}">
+                                <repeat group="{{ @data['changelogs'][@file['version']] }}" value="{{ @log }}">
                                     <li>{{ @log }}</li>
                                 </repeat>
                             </ul>

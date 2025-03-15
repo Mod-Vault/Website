@@ -39,17 +39,12 @@ class Mods extends \Model {
             if(empty($log)) {
                 continue;
             }
-            $this->db->run("INSERT INTO mod_catalog_changelogs (mod_catalog_id, version, log) VALUES (?, ?, ?)", [$mod_catalog_id, $version, $log]);
+            $this->db->run("INSERT INTO mod_catalog_changelogs (mod_catalog_id, `version`, `log`) VALUES (?, ?, ?)", [$mod_catalog_id, $version, $log]);
         }
     }
 
     public function update_mod($mod_catalog_id, $update) {
-
-        $update_str = $this->db->parse_data_array($update, 'update');
-        $update['uid'] = $mod_catalog_id;
-
-        $this->db->run("UPDATE mod_catalog SET {$update_str} WHERE uid=:uid", $update);
-
+        $this->db->update('mod_catalog', $update, ['uid' => $mod_catalog_id]);
     }
 
     public function get_user_mods($user_id) {
@@ -100,7 +95,7 @@ class Mods extends \Model {
         ', [$mod_catalog_id]);
 
         $output['changelogs'] = $this->db->run("SELECT version, log FROM mod_catalog_changelogs WHERE mod_catalog_id=? ORDER BY version DESC", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
-        $output['links'] = $this->db->keypair("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id]);
+        $output['links'] = $this->db->keypairs("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id], true);
 
         $output['game_info'] = $this->db->row("SELECT * FROM games WHERE uid=?", [$output['info']['game_id']]);
 
@@ -125,15 +120,17 @@ class Mods extends \Model {
 
     public function add_mod($data) {
 
-        $catalog_id = $this->db->insert('mod_catalog', [
+        $this->db->insert('mod_catalog', [
             'game_id' => $data['game_id'],
             'owner' => $_SESSION['user']['uid'],
             'name' => $data['name'],
             'description' => $data['description'],
             'current_version' => $data['version']
         ]);
+        $catalog_id = $this->db->lastInsertId();
 
-        $this->update_mod_links($catalog_id, $data['link_file'], $data['link_file_description']);
+        if(array_key_exists('link_file', $data))
+            $this->update_mod_links($catalog_id, $data['link_file'], $data['link_file_description']);
 
         if(!empty($data['changelog'])) {
             $logs = array_values(array_filter(explode(PHP_EOL, $_POST['changelog'])));

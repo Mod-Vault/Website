@@ -102,7 +102,7 @@ class GrumpyPdo extends \PDO
      * @return The first row of the result set. 
      * Read https://www.php.net/manual/en/pdostatement.fetch.php for more options
      */
-    public function row($query, $values = array(), $mode = null, $cursorOrientation = null, $cursorOffset = 0)
+    public function row($query, $values = array(), $mode = 0, $cursorOrientation = 0, $cursorOffset = 0)
     {
         return $this->run($query, $values)->fetch($mode, $cursorOrientation, $cursorOffset);
     }
@@ -120,7 +120,7 @@ class GrumpyPdo extends \PDO
      * @return An array of all the rows in the result set.
      * Read https://www.php.net/manual/en/pdostatement.fetchall.php for more options
      */
-    public function all($query, $values = array(), $mode = null, $c = null, $args = null)
+    public function all($query, $values = array(), $mode = 0, $c = null, $args = null)
     {
         $qry = $this->run($query, $values);
         switch($mode) {
@@ -165,9 +165,13 @@ class GrumpyPdo extends \PDO
      * @return An array of the result of the query as key-value pairs. The first column is the index, 
      * the value is an array of all of the values from the second column.
      */
-    public function keypairs($query, $values = array())
+    public function keypairs($query, $values = array(), $has_unique_key = false)
     {
-        return $this->all($query, $values, \PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
+        if($has_unique_key) {
+            return $this->all($query, $values, \PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
+        } else {
+            return $this->all($query, $values, \PDO::FETCH_GROUP|\PDO::FETCH_ASSOC);
+        }
     }
 
     /**

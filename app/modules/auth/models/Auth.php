@@ -49,14 +49,16 @@ class Auth extends \Model {
             if($keep_logged_in) {
                 $token = [
                     'user_id' => $_SESSION['user']['uid'],
-                    'hash' => password_hash($_SESSION['user']['uid'], PASSWORD_DEFAULT)
+                    'hash' => bin2hex(random_bytes(32))
                 ];
 
+                $token_hashed = $token;
+                $token_hashed['hash'] = password_hash($token_hashed['hash'], PASSWORD_DEFAULT);
+
                 $this->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$token['user_id']]);
-                $this->db->insert('users_login_tokens', $token);
+                $this->db->insert('users_login_tokens', $token_hashed);
                 setcookie("keep_me_logged_in", json_encode($token));
             }
-
             return;
         } else {
             return 'The given username/email or password does not match our records.';

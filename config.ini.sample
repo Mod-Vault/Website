@@ -7,6 +7,8 @@
 defaultModule = "discover"
 defaultTemplate = "templates/main"
 
+basePath = "/"
+
 ; DATABASE SETUP
 db_host = "localhost"
 db_username = ""

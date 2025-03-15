@@ -11,20 +11,17 @@
     <check if="{{ @SESSION.user['uid'] == @GET.user_id }}">
         <div class="ui secondary segment">
             <h1>Manage Your Mods</h1>
-            <a href="/mods/add" class="ui primary button">Add Mod</a>
+            <a href="mods/add" class="ui primary button">Add Mod</a>
         </div>
     </check>
     <h1>Mods from {{ @data['user']['display_name'] }}</h1>
     <div class="ui link cards">
-        <repeat group="{{ @data[mods] }}" value="{{ @mod }}">
-            <a href="/mods/details?uid={{ @mod['uid'] }}" class="secondary card">
-        		<!-- <div class="image">
-        			<img src="{{ @game['thumbnail'] }}">
-        		</div> -->
+        <repeat group="{{ @data['mods'] }}" value="{{ @mod }}">
+            <a href="mods/details?uid={{ @mod['uid'] }}" class="secondary card">
         		<div class="content">
         			<h2 class="ui header">
                         {{ @mod['name'] }}
-                        <div class="sub header">Author: {{ @mod[author] }}</div>
+                        <div class="sub header">Author: {{ @mod['author'] }}</div>
                     </h2>
         		</div>
         	</a>

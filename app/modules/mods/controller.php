@@ -16,6 +16,19 @@ class controller extends \Controller {
 		echo $this->render('index');
 	}
 
+	function approve_file() {
+
+		if(!$this->f3->active_user_is_admin) {
+			echo 'uh, no';
+			die();
+		}
+
+		$values = $_GET;
+		$this->f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
+
+		header('Location: ' . $_SERVER['HTTP_REFERER']);
+	}
+
 	function details() {
 
 		$mod_catalog_id = $_GET['uid'];

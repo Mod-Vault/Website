@@ -16,10 +16,7 @@
 
     <div class="ui link cards">
         <repeat group="{{ @data }}" value="{{ @mod }}">
-            <a href="/mods/details?uid={{ @mod['uid'] }}" class="secondary card">
-        		<!-- <div class="image">
-        			<img src="{{ @game['thumbnail'] }}">
-        		</div> -->
+            <a href="mods/details?uid={{ @mod['uid'] }}" class="secondary card">
         		<div class="content">
         			<h2 class="ui header">
                         {{ @mod['name'] }}

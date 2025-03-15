@@ -5,6 +5,7 @@ class Controller {
 	protected $f3;
 
 	function beforeroute(){
+		if(!isset($module)) return;
 		$ui = $this->f3->get('UI');
 		if(file_exists($file = "{$ui}$module/beforeroute.php")) {
 			include $file;
@@ -15,6 +16,7 @@ class Controller {
 	}
 
 	function afterroute(){
+		if(!isset($module)) return;
 		$ui = $this->f3->get('UI');
 		if(file_exists($file = "{$ui}$module/afterroute.php")) {
 			include $file;

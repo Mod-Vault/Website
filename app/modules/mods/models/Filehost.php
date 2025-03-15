@@ -43,7 +43,6 @@ class Filehost extends \Model {
 
         if($moved) {
             $this->db->insert('mod_attached_files', [
-                'game_id' => $nfo['game_id'],
                 'mod_catalog_id' => $game_catalog_id,
                 'path' => $upload_path,
                 'filename' => $storage_name,

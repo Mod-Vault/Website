@@ -34,29 +34,35 @@ $f3->set('db', $db);
 
 //$f3->set('a4a_referer', preg_match("/https:\/\/{$_SERVER[HTTP_HOST]}/", $_SERVER[HTTP_REFERER]));
 
+$f3->set('active_user_is_admin', false);
+if(array_key_exists('user', $_SESSION)) $f3->set('active_user_is_admin', $_SESSION['user']['is_admin']);
+
 if(empty($_SESSION['user']) && !empty($_COOKIE['keep_me_logged_in'])) {
     $token_details = json_decode($_COOKIE['keep_me_logged_in'], true);
 
-    if($token = $db->row("SELECT user_id, hash FROM users_login_tokens WHERE user_id=? AND hash=?", [$token_details['user_id'], $token_details['hash']])) {
+    if($token = $db->row("SELECT user_id, hash FROM users_login_tokens WHERE user_id=?", [$token_details['user_id']])) {
+        if(password_verify($token_details['hash'], $token['hash'])) {
+            $user = $db->row('SELECT * FROM users WHERE uid=?', [$token['user_id']]);
 
-        //log in user
-        $user = $db->row('SELECT * FROM users WHERE uid=?', [$token['user_id']]);
-        unset($user['password']);
-        $_SESSION['user'] = $user;
+            unset($user['password']);
+            $_SESSION['user'] = $user;
 
-        //regenerate new login token
-        $token = [
-            'user_id' => $_SESSION['user']['uid'],
-            'hash' => password_hash($_SESSION['user']['uid'], PASSWORD_DEFAULT)
-        ];
+            $token = [
+                'user_id' => $_SESSION['user']['uid'],
+                'hash' => bin2hex(random_bytes(32))
+            ];
 
-        $db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$token['user_id']]);
-        $db->insert('users_login_tokens', $token);
-        setcookie("keep_me_logged_in", json_encode($token));
+            $token_hashed = $token;
+            $token_hashed['hash'] = password_hash($token_hashed['hash'], PASSWORD_DEFAULT);
 
+            $db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$token['user_id']]);
+            $db->insert('users_login_tokens', $token_hashed);
+            setcookie("keep_me_logged_in", json_encode($token));
+        }
     }
-
 }
+
+//die("<pre>" . print_r($f3,true) . "</pre>");
 
 //calculate page load time
 $f3->set('loadtime', round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));

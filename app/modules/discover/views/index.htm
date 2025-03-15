@@ -13,7 +13,7 @@
 
     <div class="ui link cards">
         <repeat group="{{ @games }}" value="{{ @game }}">
-            <a href="/mods?game_id={{ @game['uid'] }}" class="secondary card">
+            <a href="mods?game_id={{ @game['uid'] }}" class="secondary card">
         		<div class="image">
         			<img src="{{ @game['thumbnail'] }}">
         		</div>
