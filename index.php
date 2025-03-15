@@ -32,8 +32,6 @@ $f3->map('/', "modules\\{$f3->get('defaultModule')}\\Controller");
 $db = new GrumpyPDO($f3->get('db_host'), $f3->get('db_username'), $f3->get('db_password'), $f3->get('db_database'));
 $f3->set('db', $db);
 
-//$f3->set('a4a_referer', preg_match("/https:\/\/{$_SERVER[HTTP_HOST]}/", $_SERVER[HTTP_REFERER]));
-
 $f3->set('active_user_is_admin', false);
 if(array_key_exists('user', $_SESSION)) $f3->set('active_user_is_admin', $_SESSION['user']['is_admin']);
 
