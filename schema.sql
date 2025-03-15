@@ -138,4 +138,22 @@ ALTER TABLE `mod_catalog_changelogs`
 
 ALTER TABLE `users_login_tokens`
   ADD CONSTRAINT `users_login_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+CREATE TABLE `mod_file_downloads` (
+	`game_catalog_id` INT(11) NOT NULL,
+	`mod_attached_file_id` INT(11) NOT NULL,
+	`timestamp` DATETIME NOT NULL DEFAULT current_timestamp(),
+	INDEX `game_catalog_id` (`game_catalog_id`) USING BTREE,
+	INDEX `mod_attached_file_id` (`mod_attached_file_id`) USING BTREE,
+	CONSTRAINT `FK__mod_attached_files` FOREIGN KEY (`mod_attached_file_id`) REFERENCES `mod_attached_files` (`uid`) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT `FK__mod_catalog` FOREIGN KEY (`game_catalog_id`) REFERENCES `mod_catalog` (`uid`) ON UPDATE CASCADE ON DELETE CASCADE
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB;
+
+
+
+
+
 COMMIT;
