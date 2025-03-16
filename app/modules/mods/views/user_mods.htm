@@ -1,8 +1,8 @@
-<check if="{{ @SESSION.user['uid'] == @GET.user_id }}"></check>
+<check if="{{ array_key_exists('user', @SESSION) && @SESSION.user['uid'] == @GET.user_id }}">
     <div class="card mt-3 border-secondary">
         <h3 class="card-header">Manage Your Mods</h3>
         <div class="card-body">
-            <a href="mods/add" type="button" class="btn btn-primary">Primary</a>
+            <a href="mods/add" type="button" class="btn btn-primary">Add New Mod</a>
         </div>
     </div>
 </check>

@@ -9,7 +9,7 @@
         <div class="card mt-3 border-secondary">
             <h3 class="card-header d-flex align-items-center">
                 <div class="flex-fill">Add New Mod</div>
-                <button class="btn btn-primary">Submit</button>
+                <button id="submit_button" class="btn btn-primary">Submit</button>
             </h3>
 
             <div class="card-body">
@@ -43,7 +43,7 @@
                 </div>
                 <div class="mb-1">
                     <label>Description</label>
-                    <textarea id="description" name="description" tabindex="-1" required></textarea>
+                    <input id="description" name="description" tabindex="-1" style="display: none" required></input>
                     <div id="editor" style="width: 100%"></div>
                     <script>
                         var editor = new Editor({
@@ -71,7 +71,7 @@
 
                 <div class="mb-1 card">
                     <div class="card-body p-2">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button id="submit_button" type="button" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
             </div>
@@ -82,8 +82,16 @@
 <script>
     $(document).ready(function() {
 
-        $('#add_mod_form').on('submit', function(e) {
-            $('#description').val(editor.getMarkdown());
+        $('#submit_button').on('click', function(e) {
+            var md = editor.getMarkdown();
+            console.log(md);
+
+            if(md == "") return;
+
+            $('#description').val(md);
+
+            return;
+            $('#add_mod_form').submit();
         });
 
         $('#add_link').on('click', function() {

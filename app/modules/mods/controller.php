@@ -38,7 +38,7 @@ class controller extends \Controller {
 		$mods = $this->model('Mods');
 
 		$mod_info = $mods->get_mod($mod_catalog_id);
-		$is_owner = $mod_info['info']['owner'] == $_SESSION['user']['uid'] || $_SESSION['user']['is_admin'];
+		$is_owner = $mod_info['info']['owner'] == array_key_exists('user', $_SESSION) && ($_SESSION['user']['uid'] || $_SESSION['user']['is_admin']);
 
 		if($this->f3->VERB == "POST") {
 
