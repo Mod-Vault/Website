@@ -1,4 +1,4 @@
-<set is_owner="{{ @SESSION.user['uid'] == @data['info']['owner'] || @SESSION.user['is_admin'] == 1 }}" />
+<set is_owner="{{ array_key_exists('user', @SESSION) && (@SESSION.user['uid'] == @data['info']['owner'] || @SESSION.user['is_admin'] == 1) }}" />
 <div class="card mt-3 border-secondary">
     <h3 class="card-header d-flex align-items-center">
         <div class="flex-fill">{{ @data['info']['name'] }}</div>
