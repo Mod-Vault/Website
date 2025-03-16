@@ -1,3 +1,29 @@
-div.ui.fixed.menu {
-    background-color: #303332;
-}
+div.toastui-editor-main.toastui-editor-md-mode {
+    background-color: #f7f1f1;
+}
+
+div.toastui-editor-md-splitter {
+    background-color: #000;
+}
+
+.ui.toggle.checkbox label:before {
+    display: block;
+    position: absolute;
+    content: '';
+    z-index: 1;
+    -webkit-transform: none;
+    transform: none;
+    border: none;
+    top: 0;
+    background: rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    width: 3.5rem;
+    height: 1.5rem;
+    border-radius: 500rem
+}
+
+.tab-content.bordered {
+    border: 1px solid #dee2e6;
+    border-top: 0px;
+}

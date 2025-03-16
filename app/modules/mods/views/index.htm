@@ -1,30 +1,22 @@
-<style>
-    img {
-        float: left !important;
-        width:  100% !important;
-        height: 200px !important;
-        object-fit: contain !important;
-    }
-</style>
-
-<div class="ui segment" style="min-height: 150px">
-    <h1>Mods for {{ @game_data['game']['name'] }}</h1>
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header">{{ @game_data['game']['name'] }} Mods</h3>
 
     <check if="{{ empty(@data) }}">
         <div class="ui yellow message"><b>Oh No!</b><br>It looks like there are no mods for this game yet.</div>
     </check>
 
-    <div class="ui link cards">
-        <repeat group="{{ @data }}" value="{{ @mod }}">
-            <a href="mods/details?uid={{ @mod['uid'] }}" class="secondary card">
-        		<div class="content">
-        			<h2 class="ui header">
-                        {{ @mod['name'] }}
-                        <div class="sub header">Author: {{ @mod['author'] }}</div>
-                    </h2>
-        		</div>
-        	</a>
-
-        </repeat>
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <repeat group="{{ @data }}" value="{{ @mod }}">
+                <a href="mods/details?uid={{ @mod['uid'] }}" class="col text-decoration-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ @mod['name'] }}</h5>
+                            <p class="card-text">Author: {{ @mod['author'] }}</p>
+                        </div>
+                    </div>
+                </a>
+            </repeat>
+        </div>
     </div>
 </div>

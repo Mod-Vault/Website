@@ -1,154 +1,159 @@
-<style>
-    img {
-        float: left !important;
-        width:  100% !important;
-        height: 200px !important;
-        object-fit: contain !important;
-    }
-    .ui.menu:not(#site_main_menu) {
-        border-bottom: 1px solid white !important;
-        padding-top: 2px;
-    }
-    .sub.header {
-        color: inherit !important;
-    }
-    #details_submenu.ui.menu .item:not(.active) {
-        background-color: #1b1c1d;
-        color: white;
-    }
-    #details_submenu.ui.menu .item.active {
-        background-color: #3d3e3f;
-        color: white;
-    }
-
-    #viewer ul li p {
-        margin-bottom: 0px;
-    }
-</style>
-
-<set is_owner="{{ @SESSION.user['uid'] == @data['info']['owner'] || @SESSION.user['is_admin'] == 1 }}"/>
-
-<div class="ui white segment">
-
-    <h2 class="ui header">
-        {{ @data['info']['name'] }}
-        <check if="{{ !empty(@data['files']['current']) }}">
-            <div class="sub header">Current Version: {{ @data['files']['current']['version'] }}</div>
-        </check>
-        <div class="sub header">Added By <a target="_blank" href="mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
-    </h2>
-
-    <div id="details_submenu" class="ui top attached tabular menu">
-        <a class="item active" data-tab="information">Information</a>
-        <check if="{{ !empty(@data['files']['current']) || @is_owner }}">
-            <a class="item" data-tab="downloads">Downloads</a>
-        </check>
-        <check if="{{ !empty(@data['changelogs']) }}">
-            <a class="item" data-tab="changelogs">Changelogs</a>
-        </check>
-    </div>
-    <div class="ui bottom attached tab segment inverted active" data-tab="information">
-        <div class="ui white segment">
-
-            <h3>
-                Description
-                <check if="{{ @is_owner }}">
-                    <button id="edit_description_button" class="ui mini green button">Edit</button>
-                </check>
-            </h3>
-
-          <div id="viewer"></div>
+<set is_owner="{{ @SESSION.user['uid'] == @data['info']['owner'] || @SESSION.user['is_admin'] == 1 }}" />
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header d-flex align-items-center">
+        <div class="flex-fill">{{ @data['info']['name'] }}</div>
+        <div class="fs-5">Author: <a target="_blank" href="mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
+    </h3>
+    <div class="card-body align-middle">
+        <div class="mb-2">
+            <b>Current Version</b>: {{ !empty(@data['files']['current']) ? @data['files']['current']['version'] : 'Unknown' }}
         </div>
-        <div class="ui white segment">
-
-            <h3>
-                Other Links
-                <check if="{{ @is_owner }}">
-                    <button id="edit_attached_links_button" class="ui mini green button">Edit</button>
-                </check>
-            </h3>
-
-            <ul>
-                <repeat group="{{ @data['links'] }}" value="{{ @nfo }}">
-                    <li><a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a></li>
-                </repeat>
-            </ul>
-        </div>
-    </div>
-    <div class="ui bottom attached tab inverted segment" data-tab="changelogs">
-        <div class="ui white segment">
-
-            <h2>Changelogs</h2>
-
-            <div class="ui styled fluid accordion" style="color: black;">
-                <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}">
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        Version {{ @version }}
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="information-tab" data-bs-toggle="tab" data-bs-target="#information-tab-pane" type="button"
+                    role="tab" aria-controls="information-tab-pane" aria-selected="true">Information</button>
+            </li>
+            <check if="{{ !empty(@data['files']['current']) || @is_owner }}">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads-tab-pane" type="button"
+                        role="tab" aria-controls="downloads-tab-pane" aria-selected="false">Downloads</button>
+                </li>
+            </check>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="changelogs-tab" data-bs-toggle="tab" data-bs-target="#changelogs-tab-pane" type="button"
+                    role="tab" aria-controls="changelogs-tab-pane" aria-selected="false">Changelogs</button>
+            </li>
+        </ul>
+        <div class="tab-content bordered p-3">
+            <div class="tab-pane fade show active" id="information-tab-pane" role="tabpanel" aria-labelledby="information-tab" tabindex="0">
+                <div class="row">
+                    <div class="col">
+                        <h3>
+                            Description
+                            <check if="{{ @is_owner }}">
+                                <button data-bs-toggle="modal" data-bs-target="#update_description_modal"
+                                    class="btn btn-secondary btn-sm">Edit</button>
+                            </check>
+                        </h3>
+                        <div id="viewer"></div>
                     </div>
-                    <div class="content">
-                        <ul>
-                            <repeat group="{{ @logs }}" value="{{ @log }}">
-                                <li>{{ @log }}</li>
-                            </repeat>
-                        </ul>
-                    </div>
-                </repeat>
-            </div>
-        </div>
-    </div>
-    <div class="ui bottom attached tab inverted segment" data-tab="downloads">
-
-        <check if="{{ @is_owner }}">
-            <div class="ui primary segment">
-                <button id="add_new_version_button"  class="ui primary button">New Version</button>
-                <button id="change_current_version_button" class="ui secondary button">Change Current Version</button>
-                <button id="add_changelog_button" class="ui secondary button">Add Changelog</button>
-                <button id="view_pending_rejected_files_button" class="ui secondary button">Pending / Rejected Files</button>
-            </div>
-        </check>
-
-        <div class="ui styled fluid accordion" style="color: black;">
-
-            <check if="{{ !empty(@data['files']['current'] )}}">
-                <div class="active title">
-                    <i class="dropdown icon"></i>
-                    Current Version - {{ @data['files']['current']['version'] }}
-                </div>
-                <div class="active content">
-                    <a href="mods/download?file_id={{ @data['files']['current']['uid'] }}" class="ui green button">Download Latest Version</a>
-                    <check if="{{ !empty(@data['changelogs'][@data['files']['current']['version']]) }}">
-                        <h3>Changelog</h3>
-                        <ul>
-                            <repeat group="{{ @data['changelogs'][@data['files']['current']['version']] }}" value="{{ @log }}">
-                                <li>{{ @log }}</li>
-                            </repeat>
-                        </ul>
+                    <check if="{{ !empty(@data['links']) || @is_owner }}">
+                        <div class="col">
+                            <h3>
+                                Links
+                                <check if="{{ @is_owner }}">
+                                    <button data-bs-toggle="modal" data-bs-target="#edit_attached_links_modal"
+                                        class="btn btn-secondary btn-sm">Edit</button>
+                                </check>
+                            </h3>
+                            <check if="{{ empty(@data['links']) }}">
+                                <true><div class="alert alert-warning mb-0">No assigned links</div></true>
+                                <false>
+                                    <ul>
+                                        <repeat group="{{ @data['links'] }}" value="{{ @nfo }}">
+                                            <li><a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a></li>
+                                        </repeat>
+                                    </ul>
+                                </false>
+                            </check>
+                        </div>
                     </check>
                 </div>
-            </check>
-            <check if="{{ !empty(@data['files']['other']) }}">
-                <repeat group="{{ @data['files']['other'] }}" value="{{ @file }}">
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        Other Version - {{ @file['version'] }}
+            </div>
+            <div class="tab-pane fade" id="downloads-tab-pane" role="tabpanel" aria-labelledby="downloads-tab" tabindex="0">
+                <check if="{{ @is_owner }}">
+                    <div class="ui primary segment">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_new_version_modal">New Version</button>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#change_current_version_modal">Change Current Version</button>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add_changelog_modal">Add Changelog</button>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pending_rejected_files_modal">Pending / Rejected Files</button>
                     </div>
-                    <div class="content">
-                        <a href="mods/download?file_id={{ @file['uid'] }}" class="ui green button">Download Other Version</a>
-                        <check if="{{ !empty(@data['changelogs'][@file['version']]) }}">
-                            <h3>Changelog</h3>
-                            <ul>
-                                <repeat group="{{ @data['changelogs'][@file['version']] }}" value="{{ @log }}">
-                                    <li>{{ @log }}</li>
-                                </repeat>
-                            </ul>
-                        </check>
-                    </div>
-                </repeat>
-            </check>
+                </check>
+
+                <div class="accordion mt-3" id="downloads-accordion">
+                    <check if="{{ empty(@data['files']['current']) && empty(@data['files']['other']) }}">
+                        <div class="alert alert-warning mb-0">
+                            There aren't any downloadable files yet
+                        </div>
+                    </check>
+                    <check if="{{ !empty(@data['files']['current'] )}}">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ @data['files']['current']['version'] }}"
+                                    aria-expanded="true" aria-controls="collapseOne">
+                                    Current Version - {{ @data['files']['current']['version'] }}
+                                </button>
+                            </h2>
+                            <div id="v-{{ @data['files']['current']['version'] }}" class="accordion-collapse collapse show p-3" data-bs-parent="#downloads-accordion">
+                                <a href="mods/download?file_id={{ @data['files']['current']['uid'] }}" class="btn btn-success">Download Latest
+                                    Version</a>
+                                <check if="{{ !empty(@data['changelogs'][@data['files']['current']['version']]) }}">
+                                    <ul class="mb-0">
+                                        <repeat group="{{ @data['changelogs'][@data['files']['current']['version']] }}" value="{{ @log }}">
+                                            <li>{{ @log }}</li>
+                                        </repeat>
+                                    </ul>
+                                </check>
+                            </div>
+                        </div>
+                    </check>
+                    <check if="{{ !empty(@data['files']['other']) }}">
+                        <repeat group="{{ @data['files']['other'] }}" value="{{ @file }}">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#v-{{ @file['version'] }}" aria-expanded="true">
+                                        Other Version - {{ @file['version'] }}
+                                    </button>
+                                </h2>
+                                <div id="v-{{ @file['version'] }}" class="accordion-collapse collapse p-3"
+                                    data-bs-parent="#downloads-accordion">
+                                    <a href="mods/download?file_id={{ @file['uid'] }}" class="btn btn-success">Download Other Version</a>
+                                    <check if="{{ !empty(@data['changelogs'][@file['version']]) }}">
+                                        <ul class="mb-0">
+                                            <repeat group="{{ @data['changelogs'][@file['version']] }}" value="{{ @log }}">
+                                                <li>{{ @log }}</li>
+                                            </repeat>
+                                        </ul>
+                                    </check>
+                                </div>
+                            </div>
+                        </repeat>
+                    </check>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="changelogs-tab-pane" role="tabpanel" aria-labelledby="changelogs-tab" tabindex="0">
+                <div class="accordion" id="changelogs-accordion">
+                    <check if="{{ !empty(@data['changelogs']) }}">
+                        <true>
+                            <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}"></repeat>
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ @version }}"
+                                            aria-expanded="true" aria-controls="collapseOne">
+                                            Version {{ @version }}
+                                        </button>
+                                    </h2>
+                                    <div id="v-{{ @version }}" class="accordion-collapse collapse show" data-bs-parent="#changelogs-accordion">
+                                        <div class="accordion-body">
+                                            <ul class="mb-0">
+                                                <repeat group="{{ @logs }}" value="{{ @log }}">
+                                                    <li>{{ @log }}</li>
+                                                </repeat>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </repeat>
+                        </true>
+                        <false>
+                            <div class="alert alert-warning mb-0">No Changelogs</div>
+                        </false>
+                    </check>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 <script>

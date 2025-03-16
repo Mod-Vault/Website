@@ -1,102 +1,89 @@
-<script src="https://cdn.tiny.cloud/1/0tbw7pe7xhv03chz9ja4vltmnnehhjahvru1qw1s1htlsaxu/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<style>
+    #external_link_container .row:not(:first-child) {
+        margin-top: 10px;
+    }
+</style>
 
-<div class="ui middle aligned grid">
-    <div class="column">
-        <form class="ui large form" method="POST" enctype="multipart/form-data">
-            <div class="ui stacked primary segment">
+<div class="d-flex align-items-center justify-content-center mb-5">
+    <form id="add_mod_form" class="ui large form" method="POST" enctype="multipart/form-data" style="width: 100%; max-width: 800px;">
+        <div class="card mt-3 border-secondary">
+            <h3 class="card-header d-flex align-items-center">
+                <div class="flex-fill">Add New Mod</div>
+                <button class="btn btn-primary">Submit</button>
+            </h3>
 
-                <h2>Add Mod</h2>
-
-                <div class="field">
-                    <div class="ui left icon large input">
-                        <div class="ui fluid search selection dropdown">
-                            <i aria-hidden="true" style="color: #8f8f8f; margin-left: -5px;" class="gamepad icon"></i>
-                        	<input type="hidden" name="game_id" required>
-                        	<i aria-hidden="true" class="dropdown icon"></i>
-                        	<div class="default text">Select Game</div>
-                        	<div class="menu">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-1">
+                            <label>Game</label>
+                            <select class="form-control" name="game_id" required>
+                                <option></option>
                                 <repeat group="{{ @games }}" value="{{ @game }}">
-                                    <div class="item" data-value="{{ @game['uid'] }}">{{ @game['name'] }}</div>
+                                    <option value="{{ @game['uid'] }}">{{ @game['name'] }}</option>
                                 </repeat>
-                        	</div>
+                            </select>
                         </div>
-
+                        <div class="mb-1">
+                            <label>Name</label>
+                            <input type="text" class="form-control" name="name" maxlength="35" />
+                        </div>
+                        <div class="mb-1">
+                            <label>Version</label>
+                            <input type="text" class="form-control" name="version" maxlength="15" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="mb-1">
+                            <label>Changelogs (one per line)</label>
+                            <textarea style="height: 171px" name="add_changelogs" class="form-control"
+                                placeholder="Enter a change log, each line is a new entry for the selected version."></textarea>
+                        </div>
                     </div>
                 </div>
-
-                <div class="field">
+                <div class="mb-1">
+                    <label>Description</label>
+                    <textarea id="description" name="description" tabindex="-1" required></textarea>
+                    <div id="editor" style="width: 100%"></div>
+                    <script>
+                        var editor = new Editor({
+                            el: document.querySelector('#editor'),
+                            height: '500px',
+                            initialEditType: 'wysiwyg',
+                            previewStyle: 'vertical'
+                        });
+                        editor.removeToolbarItem('image');
+                    </script>
+                </div>
+                <div class="mb-1 card card-body">
+                    <h5>
+                        Upload the specified version of your mod
+                    </h5>
                     <div class="ui left icon large input">
-                        <i aria-hidden="true" class="address card icon"></i>
-                        <input type="text" name="name" maxlength="35" placeholder="Name" required>
+                        <input type="file" name="host_file" accept=".zip" />
                     </div>
                 </div>
-
-                <div class="field">
-                    <div class="ui left icon large input">
-                        <i aria-hidden="true" class="edit outline icon" style="margin-top: 23px; height: unset;"></i>
-                        <textarea id="description" name="description" tabindex="-1" style="display: none;" required></textarea>
-                        <div id="editor" style="width: 100%"></div>
-                        <script>
-                            var editor = new Editor({
-                                el: document.querySelector('#editor'),
-                                height: '500px',
-                                initialEditType: 'wysiwyg',
-                                previewStyle: 'vertical',
-                                initialValue: $('#edit_description').val()
-                            });
-                            editor.removeToolbarItem('image');
-                        </script>
-                    </div>
+                <div class="mb-1 card card-body">
+                    <h5>Attach related links to this mod. <button type="button" id="add_link" aria-label="add_link" class="btn btn-success btn-sm">Add Link</button></h5>
+                    <div id="external_link_container" class="mb-2"></div>
+                    
                 </div>
 
-                <div class="field">
-                    <div class="ui left icon large input">
-                        <i aria-hidden="true" class="code branch icon"></i>
-                        <input type="text" name="version" maxlength="15" required placeholder="Current Version">
+                <div class="mb-1 card">
+                    <div class="card-body p-2">
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
-
-                <div class="field">
-                    <div class="ui left icon large input">
-                        <i aria-hidden="true" style="margin-top: 8px; height: 32px" class="sticky note icon"></i>
-                        <textarea name="changelog" required placeholder="Change log related to the version selected above. Each line is a log entry. (Optional, you will have a chance to change this later)"></textarea>
-                    </div>
-                </div>
-
-
-
-                <div class="field ui secondary segment">
-                    <h3>Upload the specified version of your mod. This will allow users to download your mod directly from {{ @websiteName }}. You will be able to upload new revisions of your mod later.</h4>
-                    <div class="ui left icon large input">
-                        <i aria-hidden="true" class="file archive icon"></i>
-                        <input type="file" name="host_file" accept=".zip"/>
-                    </div>
-
-
-                    <h3>Attach links to this mod page, whether a direct download link, github, personal site, or some other mod listing website. Other users will be able to access these links. Links can be altered at any time.</h4>
-                    <div class="ui icon buttons" style="margin-bottom: 5px;">
-                        <button type="button" id="add_link" aria-label="add_link" class="ui green button">Add Link</button>
-                    </div>
-
-                    <div id="external_link_container"></div>
-
-
-                </div>
-
-                <button id="submit_button" type="submit" class="ui secondary submit button">Add Mod</button>
             </div>
-
-            <div class="ui error message"></div>
-      </form>
-    </div>
+        </div>
+    </form>
 </div>
 
 <script>
     $(document).ready(function() {
 
-        $('#submit_button').on('click', function() {
+        $('#add_mod_form').on('submit', function(e) {
             $('#description').val(editor.getMarkdown());
-            $('#edit_description_form').submit();
         });
 
         $('#add_link').on('click', function() {
@@ -108,45 +95,20 @@
                 return;
             }
 
-            $('#external_link_container').append('\
-                <div id="external_link_template" class="three fields">\
-                    <div class="field">\
-                        <div class="ui left icon large input">\
-                            <i aria-hidden="true" class="address card icon"></i>\
-                            <input type="text" name="link_file_description[]" maxlength="45" placeholder="Link Name" required/>\
-                        </div>\
-                    </div>\
-                    <div class="field">\
-                        <div class="ui left icon large input">\
-                            <i aria-hidden="true" class="external link icon"></i>\
-                            <input type="url" name="link_file[]" placeholder="Link to External Site" required/>\
-                        </div>\
-                    </div>\
-                    <div class="field">\
-                        <button type="button" onclick="$(this).parent().parent().remove()" class="ui yellow button">Remove Link</button>\
-                    </div>\
-                </div>\
-            ');
+            $('#external_link_container').append(`
+                <div class="row">
+                    <div class="col">
+                        <input type="text" name="link_file_description[]" maxlength="45" class="form-control" placeholder="Link Name" required/>
+                    </div>
+                    <div class="col">
+                        <input type="url" name="link_file[]" class="form-control" placeholder="Link to External Site" required/>
+                    </div>
+                    <div class="col">
+                        <button type="button" onclick="$(this).parent().parent().remove()" class="btn btn-warning">Remove Link</button>
+                    </div>
+                </div>
+            `);
         });
-
-        // tinymce.init({
-        //     selector: '#description',
-        //     width: '100%',
-        //     height: '85vh',
-        //     plugins: [
-        //         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        //         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        //         'insertdatetime', 'media', 'table', 'help', 'wordcount'
-        //     ],
-        //     toolbar: 'undo redo | blocks | ' +
-        //     'bold italic backcolor | alignleft aligncenter ' +
-        //     'alignright alignjustify | bullist numlist outdent indent | ' +
-        //     'removeformat | help',
-        //     forced_root_blocks: true,
-        //     table_default_attributes: {
-        //         class: 'ui table'
-        //     }
-        // });
 
     });
 </script>

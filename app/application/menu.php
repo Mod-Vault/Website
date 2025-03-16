@@ -8,6 +8,10 @@
 
     foreach($modules as $key => $module) {
         $active = $f3->module == $key ? ' active': '';
-        echo "<a href=\"{$key}\" class=\"item{$active}\">{$module}</a>";
+        ?>
+            <li class="nav-item">
+                <a class="nav-link<?= $active ?>" aria-current="page" href="<?= $key ?>"><?= $module ?></a>
+            </li>
+        <?php
     }
 ?>
