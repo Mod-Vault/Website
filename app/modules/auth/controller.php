@@ -9,7 +9,7 @@ class controller extends \Controller {
     function post() {
         $user = new \User();
         if($user->GetUserByName($_POST['user']) && $user->ValidateCredentials($_POST['password'])) {
-            $this->Login($user);
+            $this->Login($user, $_POST['keep_logged_in']);
             return;
         } else {
             $this->f3->set('site_error', 'The login credentials that were entered are invalid');
