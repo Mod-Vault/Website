@@ -189,8 +189,9 @@ class GrumpyPdo extends \PDO
         if(!array_key_exists($verify_table, $tables)) {
             $tables = array_fill_keys(array_keys(array_flip($this->column('SHOW TABLES'))), null);
         }
-        if($exists = array_key_exists($verify_table, $tables) && empty($tables[$verify_table])) {
-            $tables[$verify_table] = $this->column("SHOW COLUMNS FROM `{$verify_table}`");
+        if($exists = array_key_exists($verify_table, $tables)) {
+            if(empty($tables[$verify_table]))
+                $tables[$verify_table] = $this->column("SHOW COLUMNS FROM `{$verify_table}`");
         } else {
             throw new Exception('The given table does not exist in the database');
         }

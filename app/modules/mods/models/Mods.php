@@ -129,8 +129,9 @@ class Mods extends \Model {
         ]);
         $catalog_id = $this->db->lastInsertId();
 
-        if(array_key_exists('link_file', $data))
-            $this->update_mod_links($catalog_id, $data['link_file'], $data['link_file_description']);
+        $link_file = array_key_exists('link_file', $data) ? $data['link_file'] : [];
+        $link_file_description = array_key_exists('link_file_description', $data) ? $data['link_file_description'] : [];
+        $this->update_mod_links($catalog_id, $link_file, $link_file_description);
 
         if(!empty($data['changelog'])) {
             $logs = array_values(array_filter(explode(PHP_EOL, $_POST['changelog'])));

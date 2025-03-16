@@ -20,7 +20,7 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 CREATE TABLE `mod_attached_files` (
-	`uid` INT(11) NOT NULL AUTO_INCREMENT,
+	`uid` INT(11) NOT NULL,
 	`mod_catalog_id` INT(11) NOT NULL,
 	`status` INT(11) NOT NULL DEFAULT '1',
 	`version` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',

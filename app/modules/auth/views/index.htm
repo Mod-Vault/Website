@@ -1,42 +1,21 @@
-<style type="text/css">
-    .column {
-        max-width: 600px;
-    }
-</style>
-
-<div id="login_container">
-    <div class="ui middle aligned center aligned grid">
-        <div class="column">
-            <form class="ui large form" method="POST">
-                <div class="ui stacked primary segment">
-
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="user icon"></i>
-                            <input type="text" name="user" placeholder="Username / Email">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="ui left icon large input">
-                            <i aria-hidden="true" class="lock icon"></i>
-                            <input type="password" name="password" placeholder="Password">
-                        </div>
-                    </div>
-                    <div class="field ui white left aligned segment">
-                        <div class="ui toggle checkbox">
-                            <input type="hidden" name="keep_logged_in" value="0">
-                            <input type="checkbox" name="keep_logged_in" value="1">
-                            <label>Keep me logged in</label>
-                        </div>
-                    </div>
-                    <button type="submit" class="ui fluid large secondary submit button">Login</button>
-                </div>
-
-                <div class="ui error message"></div>
-          </form>
-          <div class="ui message">
-                New to {{ @websiteName }}? <a href="auth/register">Sign Up</a>
-          </div>
+<div class="d-flex align-items-center justify-content-center">
+    <form method="POST" style="width: 100%; max-width: 400px;">
+        <div class="mb-1 form-control-lg">
+            <label class="form-label">Username / Email</label>
+            <input type="text" class="form-control" name="user" placeholder="Username / Email">
         </div>
-    </div>
+        <div class="mb-1 form-control-lg">
+            <label for="loginInputPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <div class="mb-1 form-control-lg">
+            <input type="hidden" class="form-check-input" name="keep_logged_in" value="0">
+            <input id="rememberCheck" type="checkbox" class="form-check-input" name="keep_logged_in" value="1">
+            <label class="form-check-label" for="rememberCheck">Keep me logged in</label>
+        </div>
+        <div class="mb-1 form-control-lg">
+            <button type="submit" class="btn btn-primary">Login</button>
+            <a href="auth/register" class="btn btn-secondary">Register</a>
+        </div>
+    </form>
 </div>

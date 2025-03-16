@@ -1,27 +1,18 @@
-<style>
-    img {
-        float: left !important;
-        width:  100% !important;
-        height: 200px !important;
-        object-fit: contain !important;
-    }
-</style>
-
-<div class="ui white segment">
-
-    <h1>Choose a Game</h1>
-
-    <div class="ui link cards">
-        <repeat group="{{ @games }}" value="{{ @game }}">
-            <a href="mods?game_id={{ @game['uid'] }}" class="secondary card">
-        		<div class="image">
-        			<img src="{{ @game['thumbnail'] }}">
-        		</div>
-        		<div class="content">
-        			<div class="header">{{ @game['name'] }}</div>
-        		</div>
-        	</a>
-
-        </repeat>
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header">Games</h3>
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <repeat group="{{ @games }}" value="{{ @game }}">
+                <a href="mods?game_id={{ @game['uid'] }}" class="col text-decoration-none">
+                    <div class="card">
+                        <img src="{{ @game['thumbnail'] }}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ @game['name'] }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </repeat>
+        </div>
     </div>
 </div>
+
