@@ -1,4 +1,4 @@
-<check if="{{ array_key_exists('user', @SESSION) && @SESSION.user['uid'] == @GET.user_id }}">
+<check if="{{ @active_user->IsUser(@GET.user_id) }}">
     <div class="card mt-3 border-secondary">
         <h3 class="card-header">Manage Your Mods</h3>
         <div class="card-body">
@@ -6,20 +6,29 @@
         </div>
     </div>
 </check>
-<div class="card mt-3 border-secondary">
-    <h3 class="card-header">{{ @data['user']['display_name'] }}'s Mods</h3>
-    <div class="card-body">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <repeat group="{{ @data['mods'] }}" value="{{ @mod }}">
-                <a href="mods/details?uid={{ @mod['uid'] }}" class="col text-decoration-none">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ @mod['name'] }}</h5>
-                            <p class="card-text">Author: {{ @mod['author'] }}</p>
-                        </div>
-                    </div>
-                </a>
-            </repeat>
+<check if="{{ !empty(@data['mods']) }}">
+    <true>
+        <div class="card mt-3 border-secondary">
+            <h3 class="card-header">{{ @data['user']['display_name'] }}'s Mods</h3>
+            <div class="card-body">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <repeat group="{{ @data['mods'] }}" value="{{ @mod }}">
+                        <a href="mods/details?uid={{ @mod['uid'] }}" class="col text-decoration-none">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ @mod['name'] }}</h5>
+                                    <p class="card-text">Author: {{ @mod['author'] }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </repeat>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </true>
+    <false>
+        <div class="alert alert-primary mt-3">
+            This user has not created any mods
+        </div>
+    </false>
+</check>

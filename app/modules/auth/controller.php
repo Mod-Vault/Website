@@ -7,47 +7,55 @@ class controller extends \Controller {
 	}
 
     function post() {
-        $auth = $this->model('Auth');
-
-        $errors = $auth->attempt_login($_POST['user'], $_POST['password'], $_POST['keep_logged_in']);
-
-        if(empty($errors)) {
-            $this->f3->reroute('/');
+        $user = new \User();
+        if($user->GetUserByName($_POST['user']) && $user->ValidateCredentials($_POST['password'])) {
+            $this->Login($user);
+            return;
         } else {
-            $this->f3->set('site_error', $errors);
+            $this->f3->set('site_error', 'The login credentials that were entered are invalid');
         }
 
         $this->get();
     }
 
     function logout() {
-		$this->f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$_SESSION['user']['uid']]);
+		$this->f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$this->f3->active_user->uid]);
         $_SESSION = [];
 		$_COOKIE['keep_me_logged_in'] = null;
         $this->f3->reroute('/');
     }
 
     function register() {
-
         if($this->f3->VERB == "POST") {
-
             if($_POST['password'] == $_POST['password_verify']) {
-                $auth = $this->model('Auth');
-                $errors = $auth->create_account($_POST['display_name'], $_POST['email'], $_POST['password']);
 
-                if(empty($errors)) {
-                    $this->f3->reroute('/');
+                $user = new \User();
+                if(($error = $user->CreateUser($_POST['display_name'], $_POST['email'], $_POST['password'])) !== true) {
+                    $this->f3->set('site_error', $error);
                 } else {
-                    $this->f3->set('site_error', $errors);
+                    $this->Login($user);
+                    $this->f3->reroute('/');
                 }
-
             } else {
-                $this->f3->set('site_error', 'The passwords that you entered did not match.');
+                $this->f3->set('site_error', 'Passwords did not match');
             }
-
 		}
 
         echo $this->render('register');
+    }
+
+    private function Login(\User $user, bool $keep_logged_in = false) {
+        if(empty($user->uid)) return;
+
+        $user->GetData();
+
+        $_SESSION['user_id'] = $user->uid;
+
+        if($keep_logged_in) {
+            $user->GenerateLoginToken();
+        }
+
+        $this->f3->reroute('/');
     }
 
 }

@@ -69,7 +69,7 @@ class Controller {
 	}
 
 	public function requires_account() {
-		if(empty($_SESSION['user'])) {
+		if($this->f3->active_user->uid == null) {
 			$this->f3->reroute('/');
 		}
 	}

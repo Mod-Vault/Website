@@ -44,14 +44,14 @@
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						{{ (require('app/application/menu.php')) == -1 ? '' : '' }}
 					</ul>
-					<check if="{{ array_key_exists('user', @SESSION) && @SESSION.user }}">
+					<check if="{{ @active_user->uid != null }}">
 						<true>
 							<div class="nav-item dropdown">
 								<button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-									{{ @SESSION.user['display_name'] }}
+									{{ @active_user->Data->display_name }}
 								</button>
 								<ul class="dropdown-menu dropdown-menu-dark">
-									<li><a class="dropdown-item" href="mods/user?user_id={{ @SESSION.user['uid'] }}">My Mods</a></li>
+									<li><a class="dropdown-item" href="mods/user?user_id={{ @active_user->uid }}">My Mods</a></li>
 									<li><a class="dropdown-item" href="auth/logout">Log Out</a></li>
 								</ul>
 							</div>

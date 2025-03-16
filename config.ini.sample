@@ -18,6 +18,6 @@ db_database = ""
 
 DEBUG=3
 UI=app/modules/
-AUTOLOAD=app/|app/application/vendor/grumpypdo/
+AUTOLOAD=app/|app/application/vendor/grumpypdo/|app/application/classes/
 TEMP=app/application/tmp/
 ;*/
