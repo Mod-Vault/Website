@@ -95,7 +95,7 @@ class Mods extends \Model {
         ', [$mod_catalog_id]);
 
         $output['changelogs'] = $this->db->run("SELECT version, log FROM mod_catalog_changelogs WHERE mod_catalog_id=? ORDER BY version DESC", [$mod_catalog_id])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
-        $output['links'] = $this->db->keypairs("SELECT uid, href, description FROM mod_attached_links WHERE mod_catalog_id=?", [$mod_catalog_id], true);
+        $output['links'] = $this->db->keypairs("SELECT uid, href, description, required FROM mod_attached_links WHERE mod_catalog_id=? ORDER BY required DESC, description ASC", [$mod_catalog_id], true);
 
         $output['game_info'] = $this->db->row("SELECT * FROM games WHERE uid=?", [$output['info']['game_id']]);
 
@@ -131,7 +131,8 @@ class Mods extends \Model {
 
         $link_file = array_key_exists('link_file', $data) ? $data['link_file'] : [];
         $link_file_description = array_key_exists('link_file_description', $data) ? $data['link_file_description'] : [];
-        $this->update_mod_links($catalog_id, $link_file, $link_file_description);
+        $required = array_key_exists('required', $data) ? $data['required'] : [];
+        $this->update_mod_links($catalog_id, $link_file, $link_file_description, $required);
 
         if(!empty($data['changelog'])) {
             $logs = array_values(array_filter(explode(PHP_EOL, $_POST['changelog'])));
@@ -142,14 +143,16 @@ class Mods extends \Model {
 
     }
 
-    public function update_mod_links($mod_catalog_id, $links, $link_descriptions) {
+    public function update_mod_links($mod_catalog_id, $links, $link_descriptions, $links_required) {
         $this->db->run('DELETE FROM mod_attached_links WHERE mod_catalog_id=?', [$mod_catalog_id]);
         foreach($links ?: [] as $key => $link) {
             $description = $link_descriptions[$key];
+            $required = $links_required[$key];
             $this->db->insert('mod_attached_links', [
                 'mod_catalog_id' => $mod_catalog_id,
                 'href' => $link,
-                'description' => $description
+                'description' => $description,
+                'required' => $required
             ]);
         }
     }

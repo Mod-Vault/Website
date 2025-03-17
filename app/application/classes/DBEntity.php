@@ -24,6 +24,17 @@ abstract class DBEntity extends Model {
         return $this->Data;
     }
 
+    protected function CleanData($data, $allowed_data_keys) {
+        $tmp = [];
+        foreach($data as $key => $value) {
+            if(in_array($key, $allowed_data_keys)) {
+                $tmp[$key] = $value;
+            }
+        }
+        return $tmp;
+    }
+
     //should always be used to fill the $Data property
     abstract protected function PullData();
+    abstract public function Create(array $data);
 }

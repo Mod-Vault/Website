@@ -152,8 +152,9 @@ CREATE TABLE `mod_file_downloads` (
 COLLATE='latin1_swedish_ci'
 ENGINE=InnoDB;
 
-
-
+-- 03-16-2025
+ALTER TABLE `mod_attached_links`
+	ADD COLUMN `required` TINYINT NOT NULL DEFAULT 0 AFTER `description`;
 
 
 COMMIT;

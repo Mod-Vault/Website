@@ -38,21 +38,22 @@ class User extends DBEntity {
         setcookie("keep_me_logged_in", json_encode($token));
     }
 
-    function CreateUser($display_name, $email, $password) {
-        if(!empty($this->Data)) return;
-        
-        $user_exists = $this->db->column('SELECT uid FROM users WHERE display_name=? OR email=? AND email IS NOT NULL', [$display_name, $email]);
-        
+    function Create($data) {
+        if($this->uid != null) return;
+
+        $values = $this->CleanData($data, ['display_name', 'email', 'password']);
+
+        $user_exists = $this->db->column('SELECT uid FROM users WHERE display_name=? OR email=? AND email IS NOT NULL', [$values['display_name'], $values['email']]);
+
         if(!empty($user_exists)) {
             return 'The specified username or email is already in use.';
         }
 
-        $this->db->insert('users', [
-            'display_name' => $display_name,
-            'email' => $email,
-            'password' => password_hash($password, PASSWORD_DEFAULT)
-        ]);
+        $values['password'] = password_hash($values['password'], PASSWORD_DEFAULT);
+
+        $this->db->insert('users', $values);
         $this->uid = $this->db->lastInsertId();
+
         $this->GetData();
         return true;
     }
@@ -68,7 +69,6 @@ class User extends DBEntity {
             WHERE
                 uid=?
         ', [$this->uid]);
-        
         $this->IsAdmin = $this->Data->is_admin;
     }
 }

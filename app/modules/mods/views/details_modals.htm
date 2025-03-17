@@ -225,11 +225,12 @@
                     generate_link_row('', '');
                 });
                 var existing_links = JSON.parse('{{ json_encode(array_values(@data["links"])) }}');
+                console.log(existing_links)
                 $.each(existing_links, function (index, value) {
-                    generate_link_row(value.href, value.description);
+                    generate_link_row(value.href, value.description, value.required);
                 });
 
-                function generate_link_row(url, text) {
+                function generate_link_row(url, text, required) {
                     $('#external_link_container').append(`
                         <div class="row">
                             <div class="col">
@@ -237,6 +238,12 @@
                             </div>
                             <div class="col">
                                 <input type="url" name="link_file[]" class="form-control" placeholder="Link to External Site" value="` + url + `" required/>
+                            </div>
+                            <div class="col-2 card">
+                                <div class="card-body p-1 text-center">
+                                    <input type="hidden" name="required[]" value="0" ` + (required == "1" ? 'disabled' : '') + ` checked class="form-checkbox disable_cb_pair other"/>
+                                    <input type="checkbox" name="required[]" value="1" ` + (required == "1" ? 'checked' : '') + ` class="form-checkbox disable_cb_pair"/> Required
+                                </div>
                             </div>
                             <div class="col">
                                 <button type="button" onclick="$(this).parent().parent().remove()" class="btn btn-warning">Remove Link</button>
@@ -247,6 +254,13 @@
                 $('#view_pending_rejected_files_button').on('click', function () {
                     $('#pending_rejected_files_modal').modal('show');
                 });
+            });
+
+            $(document).on('change', '.disable_cb_pair', function() {
+                var p = $(this).parent();
+                var other_cb = p.find('.disable_cb_pair.other');
+
+                other_cb.prop('disabled', this.checked);
             });
     </script>
 

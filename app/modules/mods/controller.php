@@ -38,7 +38,7 @@ class controller extends \Controller {
 		$mods = $this->model('Mods');
 
 		$mod_info = $mods->get_mod($mod_catalog_id);
-		$is_owner = $mod_info['info']['owner'] == array_key_exists('user', $_SESSION) && ($_SESSION['user']['uid'] || $_SESSION['user']['is_admin']);
+		$is_owner = $this->f3->active_user->IsUser($mod_info['info']['owner']) || $this->f3->active_user->IsAdmin;
 
 		if($this->f3->VERB == "POST") {
 
@@ -70,7 +70,8 @@ class controller extends \Controller {
 						case 'edit_attached_links':
 							$link_file = array_key_exists('link_file', $_POST) ? $_POST['link_file'] : [];
 							$link_file_description = array_key_exists('link_file_description', $_POST) ? $_POST['link_file_description'] : [];
-							$mods->update_mod_links($mod_catalog_id, $link_file, $link_file_description);
+							$link_file_required = array_key_exists('required', $_POST) ? $_POST['required'] : [];
+							$mods->update_mod_links($mod_catalog_id, $link_file, $link_file_description, $link_file_required);
 							break;
 					}
 				}

@@ -30,7 +30,7 @@ class controller extends \Controller {
             if($_POST['password'] == $_POST['password_verify']) {
 
                 $user = new \User();
-                if(($error = $user->CreateUser($_POST['display_name'], $_POST['email'], $_POST['password'])) !== true) {
+                if(($error = $user->Create($_POST)) !== true) {
                     $this->f3->set('site_error', $error);
                 } else {
                     $this->Login($user);

@@ -51,7 +51,10 @@
                                 <false>
                                     <ul>
                                         <repeat group="{{ @data['links'] }}" value="{{ @nfo }}">
-                                            <li><a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a></li>
+                                            <li>
+                                                <check if="{{ @nfo['required'] }}"><span class="badge rounded-pill bg-danger">REQUIRED</span></check>
+                                                <a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a>
+                                            </li>
                                         </repeat>
                                     </ul>
                                 </false>
