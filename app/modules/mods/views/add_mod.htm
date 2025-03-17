@@ -111,11 +111,24 @@
                     <div class="col">
                         <input type="url" name="link_file[]" class="form-control" placeholder="Link to External Site" required/>
                     </div>
+                    <div class="col-2 card">
+                        <div class="card-body p-1 text-center">
+                            <input type="hidden" name="required[]" value="0" checked class="form-checkbox disable_cb_pair other"/>
+                            <input type="checkbox" name="required[]" value="1" class="form-checkbox disable_cb_pair"/> Required
+                        </div>
+                    </div>
                     <div class="col">
                         <button type="button" onclick="$(this).parent().parent().remove()" class="btn btn-warning">Remove Link</button>
                     </div>
                 </div>
             `);
+
+            $(document).on('change', '.disable_cb_pair', function () {
+                var p = $(this).parent();
+                var other_cb = p.find('.disable_cb_pair.other');
+
+                other_cb.prop('disabled', this.checked);
+            });
         });
 
     });
