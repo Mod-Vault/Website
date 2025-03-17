@@ -35,10 +35,12 @@ class controller extends \Controller {
 
 		if(empty($mod_catalog_id)) die('No mod catalog ID given...');
 
-		$mods = $this->model('Mods');
+		$mod = new \Mod($mod_catalog_id, true);
+		$is_owner = $this->f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
+		$this->f3->set('mod', $mod);
+		$this->f3->set('is_owner', $is_owner);
 
-		$mod_info = $mods->get_mod($mod_catalog_id);
-		$is_owner = $this->f3->active_user->IsUser($mod_info['info']['owner']) || $this->f3->active_user->IsAdmin;
+		$mods = $this->model('Mods');
 
 		if($this->f3->VERB == "POST") {
 
@@ -46,50 +48,14 @@ class controller extends \Controller {
 
 			if($is_owner) {
 
-				$update = [];
-
-				if(!empty($_POST['change_description'])) {
-					$update['description'] = $_POST['change_description'];
-				}
-
-				if(!empty($_POST['change_version'])) {
-					$update['current_version'] = $_POST['change_version'];
-				}
-
-				if(!empty($_POST['add_changelogs'])) {
-					$logs = array_values(array_filter(explode(PHP_EOL, $_POST['add_changelogs'])));
-					$mods->post_changelogs($mod_catalog_id, $_POST['version'], $logs);
-				}
-
-				if(!empty($_POST['update_type'])) {
-					switch($_POST['update_type']) {
-						case 'new_version_upload':
-							$filehost = $this->model('Filehost');
-							$filehost->upload_file($mod_catalog_id, $_POST['version'], $_FILES['host_file'], $_POST['set_current_version']);
-							break;
-						case 'edit_attached_links':
-							$link_file = array_key_exists('link_file', $_POST) ? $_POST['link_file'] : [];
-							$link_file_description = array_key_exists('link_file_description', $_POST) ? $_POST['link_file_description'] : [];
-							$link_file_required = array_key_exists('required', $_POST) ? $_POST['required'] : [];
-							$mods->update_mod_links($mod_catalog_id, $link_file, $link_file_description, $link_file_required);
-							break;
-					}
-				}
-
-				if(!empty($update)) {
-					$mods->update_mod($mod_catalog_id, $update);
-				}
+				$mod->Update($_POST);
 
 				$this->f3->reroute("/mods/details?uid={$mod_catalog_id}");
-
 			} else {
 				die("You don't have permission to do that.");
 			}
-
 		}
 
-		$this->f3->set('data', $mod_info ?: $mods->get_mod($mod_catalog_id));
-		$this->f3->set('is_owner', $is_owner);
 		if($is_owner) {
 			$this->f3->set('owner_data', $mods->get_owner_data($mod_catalog_id));
 		}
@@ -103,22 +69,17 @@ class controller extends \Controller {
 		$this->requires_account();
 
 		if($this->f3->VERB == "POST") {
-
-			$mods = $this->model('Mods');
-			if(!$mods->does_mod_exist($_POST['game_id'], $_POST['name'])) {
-
-				$catalog_id = $mods->add_mod($_POST);
-
+			$mod = new \Mod();
+			if(($error = $mod->Create($_POST)) !== true) {
+				$this->f3->set('site_error', $error);
+			} else {
 				if(!empty($_FILES['host_file']['size'])) {
 					$filehost = $this->model('Filehost');
-					$filehost->upload_file($catalog_id, $_POST['version'], $_FILES['host_file']);
+					$filehost->upload_file($mod->uid, $mod->Data->current_version, $_FILES['host_file']);
 				}
 
-				$this->f3->reroute('/mods/user?user_id=' . $_SESSION['user']['uid']);
-			} else {
-				$this->f3->set('site_error', 'This mod with the same name already exists for this game.');
+				$this->f3->reroute('/mods/details?uid=' . $mod->uid);
 			}
-
 		}
 
 		$catalog = $this->model('Catalog', 'discover');

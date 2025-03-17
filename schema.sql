@@ -156,5 +156,9 @@ ENGINE=InnoDB;
 ALTER TABLE `mod_attached_links`
 	ADD COLUMN `required` TINYINT NOT NULL DEFAULT 0 AFTER `description`;
 
+ALTER TABLE `mod_catalog_changelogs`
+	DROP FOREIGN KEY `mod_catalog_changelogs_ibfk_1`;
+ALTER TABLE `mod_catalog_changelogs`
+	ADD CONSTRAINT `mod_catalog_changelogs_ibfk_1` FOREIGN KEY (`mod_catalog_id`) REFERENCES `mod_catalog` (`uid`) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 COMMIT;

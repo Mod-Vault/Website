@@ -24,13 +24,31 @@ abstract class DBEntity extends Model {
         return $this->Data;
     }
 
-    protected function CleanData($data, $allowed_data_keys) {
+    protected function CleanData($data, $allowed_data_keys, $group_keys = []) {
         $tmp = [];
-        foreach($data as $key => $value) {
-            if(in_array($key, $allowed_data_keys)) {
+
+        foreach ($group_keys as $group_key => $group) {
+            $grouped_data = [];
+            $count = count($data[$group[0]] ?? []);
+
+            for ($i = 0; $i < $count; $i++) {
+                $entry = [];
+                foreach ($group as $field) {
+                    $entry[$field] = $data[$field][$i] ?? null;
+                }
+                $grouped_data[] = $entry;
+            }
+            $tmp[$group_key] = $grouped_data;
+        }
+
+        $tmp = array_filter($tmp);
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $allowed_data_keys) && !empty($value)) {
                 $tmp[$key] = $value;
             }
         }
+
         return $tmp;
     }
 

@@ -9,7 +9,7 @@
         <div class="card mt-3 border-secondary">
             <h3 class="card-header d-flex align-items-center">
                 <div class="flex-fill">Add New Mod</div>
-                <button id="submit_button" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary submit_button">Submit</button>
             </h3>
 
             <div class="card-body">
@@ -29,8 +29,8 @@
                             <input type="text" class="form-control" name="name" maxlength="35" />
                         </div>
                         <div class="mb-1">
-                            <label>Version</label>
-                            <input type="text" class="form-control" name="version" maxlength="15" />
+                            <label>Current Version</label>
+                            <input type="text" class="form-control" name="current_version" maxlength="15" />
                         </div>
                     </div>
                     <div class="col">
@@ -71,7 +71,7 @@
 
                 <div class="mb-1 card">
                     <div class="card-body p-2">
-                        <button id="submit_button" type="button" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary submit_button">Submit</button>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
 <script>
     $(document).ready(function() {
 
-        $('#submit_button').on('click', function(e) {
+        $('.submit_button').on('click', function(e) {
             var md = editor.getMarkdown();
             console.log(md);
 
@@ -90,7 +90,6 @@
 
             $('#description').val(md);
 
-            return;
             $('#add_mod_form').submit();
         });
 

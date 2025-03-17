@@ -1,19 +1,18 @@
-<set is_owner="{{ @active_user->IsUser(@data['info']['owner']) || @active_user->IsAdmin }}" />
 <div class="card mt-3 border-secondary">
     <h3 class="card-header d-flex align-items-center">
-        <div class="flex-fill">{{ @data['info']['name'] }}</div>
-        <div class="fs-5">Author: <a target="_blank" href="mods/user?user_id={{ @data['info']['owner'] }}">{{ @data['info']['author'] }}</a></div>
+        <div class="flex-fill">{{ @mod->Data->name }}</div>
+        <div class="fs-5">Author: <a target="_blank" href="mods/user?user_id={{ @mod->Data->owner }}">{{ @mod->Data->owner_name }}</a></div>
     </h3>
     <div class="card-body align-middle">
         <div class="mb-2">
-            <b>Current Version</b>: {{ !empty(@data['files']['current']) ? @data['files']['current']['version'] : 'Unknown' }}
+            <b>Current Version</b>: {{ !empty(@mod->Data->current_file) ? @mod->Data->current_file->version : 'Unknown' }}
         </div>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="information-tab" data-bs-toggle="tab" data-bs-target="#information-tab-pane" type="button"
                     role="tab" aria-controls="information-tab-pane" aria-selected="true">Information</button>
             </li>
-            <check if="{{ !empty(@data['files']['current']) || @is_owner }}">
+            <check if="{{ !empty(@mod->Data->current_file) || @is_owner }}">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="downloads-tab" data-bs-toggle="tab" data-bs-target="#downloads-tab-pane" type="button"
                         role="tab" aria-controls="downloads-tab-pane" aria-selected="false">Downloads</button>
@@ -37,7 +36,7 @@
                         </h3>
                         <div id="viewer"></div>
                     </div>
-                    <check if="{{ !empty(@data['links']) || @is_owner }}">
+                    <check if="{{ !empty(@mod->Data->mod_links) || @is_owner }}">
                         <div class="col">
                             <h3>
                                 Links
@@ -46,14 +45,14 @@
                                         class="btn btn-secondary btn-sm">Edit</button>
                                 </check>
                             </h3>
-                            <check if="{{ empty(@data['links']) }}">
+                            <check if="{{ empty(@mod->Data->mod_links) }}">
                                 <true><div class="alert alert-warning mb-0">No assigned links</div></true>
                                 <false>
                                     <ul>
-                                        <repeat group="{{ @data['links'] }}" value="{{ @nfo }}">
+                                        <repeat group="{{ @mod->Data->mod_links }}" value="{{ @nfo }}">
                                             <li>
-                                                <check if="{{ @nfo['required'] }}"><span class="badge rounded-pill bg-danger">REQUIRED</span></check>
-                                                <a target="_blank" href="{{ @nfo['href'] }}">{{ @nfo['description'] }}</a>
+                                                <check if="{{ @nfo->required }}"><span class="badge rounded-pill bg-danger">REQUIRED</span></check>
+                                                <a target="_blank" href="{{ @nfo->href }}">{{ @nfo->description }}</a>
                                             </li>
                                         </repeat>
                                     </ul>
@@ -74,25 +73,25 @@
                 </check>
 
                 <div class="accordion mt-3" id="downloads-accordion">
-                    <check if="{{ empty(@data['files']['current']) && empty(@data['files']['other']) }}">
+                    <check if="{{ empty(@mod->Data->current_file) && empty(@mod->Data->other_files) }}">
                         <div class="alert alert-warning mb-0">
                             There aren't any downloadable files yet
                         </div>
                     </check>
-                    <check if="{{ !empty(@data['files']['current'] )}}">
+                    <check if="{{ !empty(@mod->Data->current_file)}}">
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ @data['files']['current']['version'] }}"
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ @mod->Data->current_file->version }}"
                                     aria-expanded="true" aria-controls="collapseOne">
-                                    Current Version - {{ @data['files']['current']['version'] }}
+                                    Current Version - {{ @mod->Data->current_file->version }}
                                 </button>
                             </h2>
-                            <div id="v-{{ @data['files']['current']['version'] }}" class="accordion-collapse collapse show p-3" data-bs-parent="#downloads-accordion">
-                                <a href="mods/download?file_id={{ @data['files']['current']['uid'] }}" class="btn btn-success">Download Latest
+                            <div id="v-{{ @mod->Data->current_file->version }}" class="accordion-collapse collapse show p-3" data-bs-parent="#downloads-accordion">
+                                <a href="mods/download?file_id={{ @mod->Data->current_file->uid }}" class="btn btn-success">Download Latest
                                     Version</a>
-                                <check if="{{ !empty(@data['changelogs'][@data['files']['current']['version']]) }}">
+                                <check if="{{ !empty(@mod->Data->changelogs->{@mod->Data->current_file->version}) }}">
                                     <ul class="mb-0">
-                                        <repeat group="{{ @data['changelogs'][@data['files']['current']['version']] }}" value="{{ @log }}">
+                                        <repeat group="{{ @mod->Data->changelogs->{@mod->Data->current_file->version} }}" value="{{ @log }}">
                                             <li>{{ @log }}</li>
                                         </repeat>
                                     </ul>
@@ -100,21 +99,21 @@
                             </div>
                         </div>
                     </check>
-                    <check if="{{ !empty(@data['files']['other']) }}">
-                        <repeat group="{{ @data['files']['other'] }}" value="{{ @file }}">
+                    <check if="{{ !empty(@mod->Data->other_files) }}">
+                        <repeat group="{{ @mod->Data->other_files }}" value="{{ @file }}">
                             <div class="accordion-item">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#v-{{ @file['version'] }}" aria-expanded="true">
-                                        Other Version - {{ @file['version'] }}
+                                        data-bs-target="#v-{{ @file->version }}" aria-expanded="true">
+                                        Other Version - {{ @file->version }}
                                     </button>
                                 </h2>
-                                <div id="v-{{ @file['version'] }}" class="accordion-collapse collapse p-3"
+                                <div id="v-{{ @file->version }}" class="accordion-collapse collapse p-3"
                                     data-bs-parent="#downloads-accordion">
-                                    <a href="mods/download?file_id={{ @file['uid'] }}" class="btn btn-success">Download Other Version</a>
-                                    <check if="{{ !empty(@data['changelogs'][@file['version']]) }}">
+                                    <a href="mods/download?file_id={{ @file->uid }}" class="btn btn-success">Download Other Version</a>
+                                    <check if="{{ !empty(@mod->Data->changelogs->{@file->version}) }}">
                                         <ul class="mb-0">
-                                            <repeat group="{{ @data['changelogs'][@file['version']] }}" value="{{ @log }}">
+                                            <repeat group="{{ @mod->Data->changelogs->{@file->version} }}" value="{{ @log }}">
                                                 <li>{{ @log }}</li>
                                             </repeat>
                                         </ul>
@@ -127,17 +126,17 @@
             </div>
             <div class="tab-pane fade" id="changelogs-tab-pane" role="tabpanel" aria-labelledby="changelogs-tab" tabindex="0">
                 <div class="accordion" id="changelogs-accordion">
-                    <check if="{{ !empty(@data['changelogs']) }}">
+                    <check if="{{ !empty(@mod->Data->changelogs) }}">
                         <true>
-                            <repeat group="{{ @data['changelogs'] }}" key="{{ @version }}" value="{{ @logs }}"></repeat>
+                            <repeat group="{{ @mod->Data->changelogs }}" key="{{ @version }}" value="{{ @logs }}">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
                                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#v-{{ @version }}"
                                             aria-expanded="true" aria-controls="collapseOne">
-                                            Version {{ @version }}
+                                            Version {{ @version . (@version == @mod->Data->current_file->version ? ' (Current)' : '') }}
                                         </button>
                                     </h2>
-                                    <div id="v-{{ @version }}" class="accordion-collapse collapse show" data-bs-parent="#changelogs-accordion">
+                                    <div id="v-{{ @version }}" class="accordion-collapse collapse {{ @version == @mod->Data->current_file->version ? 'show' : '' }}" data-bs-parent="#changelogs-accordion">
                                         <div class="accordion-body">
                                             <ul class="mb-0">
                                                 <repeat group="{{ @logs }}" value="{{ @log }}">

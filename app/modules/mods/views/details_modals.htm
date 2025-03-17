@@ -15,8 +15,8 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <textarea id="edit_description" name="change_description" style="display: none;"
-                            required>{{ @data['info']['description'] }}</textarea>
+                        <textarea id="edit_description" name="description" style="display: none;"
+                            required>{{ @mod->Data->description }}</textarea>
                         <div id="editor" style="width: 100%"></div>
                         <script>
                             var editor = new Editor({
@@ -72,7 +72,7 @@
                     <div class="modal-body">
                         <div class="mb-1">
                             <label>Changelog Version</label>
-                            <select class="form-control" name="version">
+                            <select class="form-control" name="changelog_version">
                                 <repeat group="{{ @owner_data['all_versions'] }}" value="{{ @version }}">
                                     <option value="{{ @version }}">{{ @version }}</option>
                                 </repeat>
@@ -155,7 +155,7 @@
                     <div class="modal-body">
                         <div class="mb-1">
                             <label>Changelog Version</label>
-                            <select class="form-control" name="version">
+                            <select class="form-control" name="change_version">
                                 <repeat group="{{ @owner_data['all_versions'] }}" value="{{ @version }}">
                                     <option value="{{ @version }}">{{ @version }}</option>
                                 </repeat>
@@ -183,7 +183,7 @@
                         <input type="hidden" name="update_type" value="new_version_upload" />
                         <div class="mb-1">
                             <label>New Version</label>
-                            <input type="text" name="version" class="form-control" maxlength="15" required placeholder="New Version">
+                            <input type="text" name="changelog_version" class="form-control" maxlength="15" required placeholder="New Version">
                         </div>
                         <div class="mb-1 card card-body p-2">
                             <input type="file" name="host_file" accept=".zip" required />
@@ -224,8 +224,7 @@
                     }
                     generate_link_row('', '');
                 });
-                var existing_links = JSON.parse('{{ json_encode(array_values(@data["links"])) }}');
-                console.log(existing_links)
+                var existing_links = JSON.parse('{{ json_encode(array_values((array)@mod->Data->mod_links)) }}');
                 $.each(existing_links, function (index, value) {
                     generate_link_row(value.href, value.description, value.required);
                 });
