@@ -4,12 +4,11 @@ class User extends DBEntity {
     public bool $IsAdmin = false;
 
     function IsUser($user_id) {
-        if($this->uid == null) return false;
         return $this->uid == $user_id;
     }
 
     function ValidateCredentials($password) {
-        if(empty($this->uid)) return false;
+        if(!$this->IsValidEntity()) return false;
         $hash = $this->db->cell('SELECT password FROM users WHERE uid=?', [$this->uid]);
         return password_verify($password, $hash);
     }
@@ -25,6 +24,8 @@ class User extends DBEntity {
     }
 
     function GenerateLoginToken() {
+        if(!$this->IsValidEntity()) return;
+        
         $token = [
             'user_id' => $this->uid,
             'hash' => bin2hex(random_bytes(32))
@@ -39,7 +40,7 @@ class User extends DBEntity {
     }
 
     function Create($data) {
-        if($this->uid != null) return;
+        if($this->IsValidEntity()) return false;
 
         $values = $this->CleanData($data, ['display_name', 'email', 'password']);
 
@@ -58,7 +59,40 @@ class User extends DBEntity {
         return true;
     }
 
+    function GetMods() {
+        if(!$this->IsValidEntity()) return false;
+        
+        $all_mods = $this->db->all('
+            SELECT
+                mc.*,
+                g.name as game_name
+            FROM
+                mod_catalog mc
+            LEFT JOIN games g ON g.uid=mc.game_id
+            WHERE
+                mc.owner=?
+        ', [$this->uid]);
+
+        $sorted_mods = [];
+        foreach($all_mods as $mod) {
+            if(!array_key_exists('game_id', $sorted_mods)) {
+                $sorted_mods[$mod['game_id']] = [
+                    'game_name' => $mod['game_name']
+                ];
+            }
+            $sorted_mods[$mod['game_id']]['mods'][$mod['uid']] = [
+                'name' => $mod['name'],
+                'description' => $mod['description'],
+                'current_version' => $mod['current_version']
+            ];
+        }
+
+        return json_decode(json_encode($sorted_mods));
+    }
+
     function PullData() {
+        if(!$this->IsValidEntity()) return;
+
         $this->Data = (object)$this->db->row('
             SELECT
                 uid,

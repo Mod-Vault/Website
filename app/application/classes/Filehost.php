@@ -1,16 +1,18 @@
 <?php
-namespace modules\mods\models;
 class Filehost extends \Model {
 
-    public function log_download($mod_attached_file_id, $game_catalog_id) {
-        $this->db->run('INSERT into mod_file_downloads (game_catalog_id, mod_attached_file_id) VALUES (?, ?)', [$game_catalog_id, $mod_attached_file_id]);
+    public function LogDownload($mod_attached_file_id, $game_catalog_id) {
+        $this->db->insert('mod_file_downloads', [
+            'game_catalog_id' => $game_catalog_id,
+            'mod_attached_file_id' => $mod_attached_file_id
+        ]);
     }
 
-    public function get_file_info($file_id) {
+    public function GetFileInfo($file_id) {
         return $this->db->row('SELECT * FROM mod_attached_files WHERE uid=?', [$file_id]);
     }
 
-    public function upload_file($game_catalog_id, $version, $file, $set_new_version = 0) {
+    public function UploadFile($game_catalog_id, $version, $file, $set_new_version = 0) {
 
         $nfo = $this->db->row("
             SELECT

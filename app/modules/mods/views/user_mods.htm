@@ -1,4 +1,4 @@
-<check if="{{ @active_user->IsUser(@GET.user_id) }}">
+<check if="{{ @active_user->IsUser(@user->uid) }}">
     <div class="card mt-3 border-secondary">
         <h3 class="card-header">Manage Your Mods</h3>
         <div class="card-body">
@@ -6,25 +6,29 @@
         </div>
     </div>
 </check>
-<check if="{{ !empty(@data['mods']) }}">
+
+<set user_mods="{{ @user->GetMods() }}"/>
+<check if="{{ !empty(@user_mods) }}">
     <true>
-        <div class="card mt-3 border-secondary">
-            <h3 class="card-header">{{ @data['user']['display_name'] }}'s Mods</h3>
-            <div class="card-body">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <repeat group="{{ @data['mods'] }}" value="{{ @mod }}">
-                        <a href="mods/details?uid={{ @mod['uid'] }}" class="col text-decoration-none">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ @mod['name'] }}</h5>
-                                    <p class="card-text">Author: {{ @mod['author'] }}</p>
+        <repeat group="{{ @user_mods }}" key="{{ @game_id }}" value="{{ @game_data }}">
+            <div class="card mt-3 border-secondary">
+                <h3 class="card-header">{{ @game_data->game_name }}</h3>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <repeat group="{{ @game_data->mods }}" key="{{ @mod_id }}" value="{{ @mod }}">
+                            <a href="mods/details?uid={{ @mod_id }}" class="col text-decoration-none">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ @mod->name }}</h5>
+                                        <p class="card-text">Author: {{ @user->Data->display_name }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    </repeat>
+                            </a>
+                        </repeat>
+                    </div>
                 </div>
             </div>
-        </div>
+        </repeat>
     </true>
     <false>
         <div class="alert alert-primary mt-3">

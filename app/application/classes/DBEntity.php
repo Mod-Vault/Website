@@ -52,6 +52,10 @@ abstract class DBEntity extends Model {
         return $tmp;
     }
 
+    protected function IsValidEntity() {
+        return $this->uid != null;
+    }
+
     //should always be used to fill the $Data property
     abstract protected function PullData();
     abstract public function Create(array $data);

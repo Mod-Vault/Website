@@ -2,15 +2,13 @@
 class Mod extends DBEntity {
 
     function IsMod($mod_id) {
-        if($this->uid == null) return false;
         return $this->uid == $mod_id;
     }
 
     function Update($data) {
+        if(!$this->IsValidEntity()) return;
 
         $update_type = array_key_exists('update_type', $data) ? $data['update_type'] : null;
-
-        echo "<pre>" . print_r($data,true) . "</pre>";
 
         $values = $this->CleanData(
             $data,
@@ -19,8 +17,6 @@ class Mod extends DBEntity {
                 'link_file' => ['link_file_description', 'link_file', 'required']
             ]
         );
-
-        echo "<pre>" . print_r($values,true) . "</pre>";
 
         if(array_key_exists('change_version', $values)) {
             $values['current_version'] = $values['change_version'];
@@ -32,8 +28,8 @@ class Mod extends DBEntity {
 
         switch($update_type) {
             case 'new_version_upload':
-                $filehost = new \modules\mods\models\Filehost();
-                $filehost->upload_file($this->uid, $values['changelog_version'], $_FILES['host_file'], $values['set_current_version']);
+                $filehost = new \Filehost();
+                $filehost->UploadFile($this->uid, $values['changelog_version'], $_FILES['host_file'], $values['set_current_version']);
                 break;
             case 'edit_attached_links':
                 $this->UpdateModLinks($values['link_file']);
@@ -42,14 +38,12 @@ class Mod extends DBEntity {
 
         $values = $this->CleanData($values, ['description', 'current_version']);
 
-        //die("<pre>" . print_r($values,true) . "</pre>");
-
         if(!empty($values))
             $this->db->update('mod_catalog', $values, ['uid' => $this->uid]);
     }
 
     function Create($data) {
-        if(!empty($this->Data)) return;
+        if($this->IsValidEntity()) return;
 
         $values = $this->CleanData(
             $data, 
@@ -83,6 +77,7 @@ class Mod extends DBEntity {
     }
 
     private function PostChangelogs($version, $logs) {
+        if(!$this->IsValidEntity()) return;
         foreach($logs as $log) {
             if(empty($log)) continue;
             $this->db->insert('mod_catalog_changelogs', [
@@ -94,6 +89,7 @@ class Mod extends DBEntity {
     }
 
     public function UpdateModLinks($links) {
+        if(!$this->IsValidEntity()) return;
         $this->db->run('DELETE FROM mod_attached_links WHERE mod_catalog_id=?', [$this->uid]);
         foreach($links ?: [] as $key => $link_data) {
             $this->db->insert('mod_attached_links', [
@@ -105,7 +101,27 @@ class Mod extends DBEntity {
         }
     }
 
+    public function GetRestrictedData() {
+        if(!$this->IsValidEntity()) return;
+        return [
+            'pending_rejected_files' => $this->db->all("
+                SELECT
+                    mod_attached_files.*,
+                    attached_file_status.description as status_description
+                FROM
+                    mod_attached_files
+                LEFT JOIN attached_file_status ON attached_file_status.uid=mod_attached_files.status
+                WHERE
+                    mod_catalog_id=?
+                    AND status IN (1,2,3,5)
+            ", [$this->uid]),
+            'all_versions' => $this->db->column("SELECT version FROM mod_attached_files WHERE mod_catalog_id=?", [$this->uid])  + [$this->db->cell("SELECT current_version FROM mod_catalog WHERE uid=?", [$this->uid])]
+        ];
+    }
+
     function PullData() {
+        if(!$this->IsValidEntity()) return;
+
         $data = $this->db->row('
             SELECT
                 mc.uid,
@@ -129,7 +145,7 @@ class Mod extends DBEntity {
         $data['mod_links'] = [];
         $data['changelogs'] = [];
 
-        $data['changelogs'] = $this->db->run("SELECT version, log FROM mod_catalog_changelogs WHERE mod_catalog_id=? ORDER BY version ASC, uid ASC", [$this->uid])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
+        $data['changelogs'] = $this->db->run("SELECT version, log FROM mod_catalog_changelogs WHERE mod_catalog_id=? ORDER BY version DESC, uid ASC", [$this->uid])->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_COLUMN);
         $data['mod_links'] = $this->db->keypairs("SELECT uid, href, description, required FROM mod_attached_links WHERE mod_catalog_id=? ORDER BY required DESC, description ASC", [$this->uid], true);
 
         $active_files = $this->db->all("SELECT * FROM mod_attached_files WHERE status=4 AND mod_catalog_id=? ORDER BY version DESC", [$this->uid]);

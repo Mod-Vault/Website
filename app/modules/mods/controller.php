@@ -7,24 +7,28 @@ class controller extends \Controller {
 		$game_id = $_GET['game_id'];
 		if(empty($game_id)) die('No game_id specified');
 
-		$mods = $this->model('Mods');
-		$catalog = $this->model('Catalog', 'discover');
+		$game = new \Game($game_id, true);
 
-		$this->f3->set('data', $mods->get_mods($game_id));
-		$this->f3->set('game_data', $catalog->get_game($game_id));
+		$this->f3->set('game', $game);
 
 		echo $this->render('index');
 	}
 
 	function approve_file() {
 
-		if(!$this->f3->active_user_is_admin) {
+		if(!$this->f3->active_user->IsAdmin) {
 			echo 'uh, no';
 			die();
 		}
 
 		$values = $_GET;
+		$file_data = $this->f3->db->row('SELECT mod_catalog_id, version, set_new_version_on_approval FROM mod_attached_files WHERE uid=?', [$values['id']]);
+
 		$this->f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
+
+		if($file_data['set_new_version_on_approval']) {
+			$this->f3->db->update('mod_catalog', ['current_version' => $file_data['version']], ['uid' => $file_data['mod_catalog_id']]);
+		}
 
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
 	}
@@ -39,8 +43,6 @@ class controller extends \Controller {
 		$is_owner = $this->f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
 		$this->f3->set('mod', $mod);
 		$this->f3->set('is_owner', $is_owner);
-
-		$mods = $this->model('Mods');
 
 		if($this->f3->VERB == "POST") {
 
@@ -57,7 +59,7 @@ class controller extends \Controller {
 		}
 
 		if($is_owner) {
-			$this->f3->set('owner_data', $mods->get_owner_data($mod_catalog_id));
+			$this->f3->set('owner_data', $mod->GetRestrictedData());
 		}
 
 		echo $this->render('details');
@@ -74,8 +76,8 @@ class controller extends \Controller {
 				$this->f3->set('site_error', $error);
 			} else {
 				if(!empty($_FILES['host_file']['size'])) {
-					$filehost = $this->model('Filehost');
-					$filehost->upload_file($mod->uid, $mod->Data->current_version, $_FILES['host_file']);
+					$filehost = new \Filehost();
+					$filehost->UploadFile($mod->uid, $mod->Data->current_version, $_FILES['host_file'], 1);
 				}
 
 				$this->f3->reroute('/mods/details?uid=' . $mod->uid);
@@ -91,13 +93,7 @@ class controller extends \Controller {
 
 	function user() {
 
-		//list uploaded mods by user by user_id
-		$user_id = $_GET['user_id'];
-
-		$mods = $this->model('Mods');
-
-		$this->f3->set('data', $mods->get_user($user_id));
-
+		$this->f3->set('user', new \User($_GET['user_id'], true));
 		echo $this->render('user_mods');
 
 	}
@@ -107,8 +103,8 @@ class controller extends \Controller {
 		$file_id = $_GET['file_id'];
 		if(empty($file_id)) die('No File ID given...');
 
-		$filehost = $this->model('Filehost');
-		$mod_info = $filehost->get_file_info($file_id);
+		$filehost = new \Filehost();
+		$mod_info = $filehost->GetFileInfo($file_id);
 
 		//any status except for these will not be allowed to be downloaded
 		//status 4 is "Available"
@@ -143,7 +139,7 @@ class controller extends \Controller {
 		   	flush();
 		   	readfile($file);
 
-			$filehost->log_download($mod_info['uid'], $mod_info['mod_catalog_id']);
+			$filehost->LogDownload($mod_info['uid'], $mod_info['mod_catalog_id']);
 
 		   	exit;
 	   } else {

@@ -87,9 +87,9 @@
                                 </button>
                             </h2>
                             <div id="v-{{ @mod->Data->current_file->version }}" class="accordion-collapse collapse show p-3" data-bs-parent="#downloads-accordion">
-                                <a href="mods/download?file_id={{ @mod->Data->current_file->uid }}" class="btn btn-success">Download Latest
-                                    Version</a>
+                                <a href="mods/download?file_id={{ @mod->Data->current_file->uid }}" class="btn btn-success float-end">Download Version {{ @mod->Data->current_file->version }}</a>
                                 <check if="{{ !empty(@mod->Data->changelogs->{@mod->Data->current_file->version}) }}">
+                                    <p class="mb-0">Changelog:</p>
                                     <ul class="mb-0">
                                         <repeat group="{{ @mod->Data->changelogs->{@mod->Data->current_file->version} }}" value="{{ @log }}">
                                             <li>{{ @log }}</li>
@@ -110,8 +110,9 @@
                                 </h2>
                                 <div id="v-{{ @file->version }}" class="accordion-collapse collapse p-3"
                                     data-bs-parent="#downloads-accordion">
-                                    <a href="mods/download?file_id={{ @file->uid }}" class="btn btn-success">Download Other Version</a>
+                                    <a href="mods/download?file_id={{ @file->uid }}" class="btn btn-success float-end">Download Version {{ @mod->Data->current_file->version }}</a>
                                     <check if="{{ !empty(@mod->Data->changelogs->{@file->version}) }}">
+                                        <p class="mb-0">Changelog:</p>
                                         <ul class="mb-0">
                                             <repeat group="{{ @mod->Data->changelogs->{@file->version} }}" value="{{ @log }}">
                                                 <li>{{ @log }}</li>
