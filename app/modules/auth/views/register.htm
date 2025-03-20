@@ -1,24 +1,30 @@
 <div class="d-flex align-items-center justify-content-center">
-    <form method="POST" style="width: 100%; max-width: 400px;">
-        <div class="mb-1 form-control-lg">
-            <label class="form-label">Dislay Name</label>
-            <input type="text" class="form-control" name="display_name" placeholder="Display Name">
+    <form class="card border-secondary" method="POST" style="width: 100%; max-width: 400px;">
+        <h2 class="card-header text-center">
+            Register
+        </h2>
+        <div class="card-body">
+            
+            <div class="mb-2">
+                <label class="form-label">Display Name</label>
+                <input type="text" class="form-control" name="display_name" placeholder="Display Name">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">E-Mail Address</label>
+                <input type="text" class="form-control" name="email" placeholder="E-Mail Address">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Verify Password</label>
+                <input type="password" class="form-control" name="password_verify" placeholder="Verify Password">
+            </div>
         </div>
-        <div class="mb-1 form-control-lg">
-            <label class="form-label">E-Mail Address</label>
-            <input type="text" class="form-control" name="email" placeholder="E-Mail Address">
-        </div>
-        <div class="mb-1 form-control-lg">
-            <label for="loginInputPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-        </div>
-        <div class="mb-1 form-control-lg">
-            <label for="loginInputPassword" class="form-label">Verify Password</label>
-            <input type="password" class="form-control" name="password_verify" placeholder="Verify Password">
-        </div>
-        <div class="mb-1 form-control-lg">
+        <div class="card-footer">
             <button type="submit" class="btn btn-primary">Register</button>
-            <a href="auth" class="btn btn-secondary">Login</a>
+            <a href="auth" class="btn btn-secondary float-end">Login</a>
         </div>
     </form>
 </div>

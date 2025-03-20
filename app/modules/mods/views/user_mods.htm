@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         <repeat group="{{ @game_data->mods }}" key="{{ @mod_id }}" value="{{ @mod }}">
-                            <a href="mods/details?uid={{ @mod_id }}" class="col text-decoration-none">
+                            <a href="mods/details/{{ @mod_id }}" class="col text-decoration-none">
                                 <div class="card">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ @mod->name }}</h5>

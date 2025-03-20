@@ -6,38 +6,38 @@ class controller extends \Controller {
 		echo $this->render('index');
 	}
 
-    function post() {
+    function post($f3) {
         $user = new \User();
         if($user->GetUserByName($_POST['user']) && $user->ValidateCredentials($_POST['password'])) {
             $this->Login($user, $_POST['keep_logged_in']);
             return;
         } else {
-            $this->f3->set('site_error', 'The login credentials that were entered are invalid');
+            $f3->set('site_error', 'The login credentials that were entered are invalid');
         }
 
         $this->get();
     }
 
-    function logout() {
-		$this->f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$this->f3->active_user->uid]);
+    function logout($f3) {
+		$f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$f3->active_user->uid]);
         $_SESSION = [];
 		$_COOKIE['keep_me_logged_in'] = null;
-        $this->f3->reroute('/');
+        $f3->reroute('/');
     }
 
-    function register() {
-        if($this->f3->VERB == "POST") {
+    function register($f3) {
+        if($f3->VERB == "POST") {
             if($_POST['password'] == $_POST['password_verify']) {
 
                 $user = new \User();
                 if(($error = $user->Create($_POST)) !== true) {
-                    $this->f3->set('site_error', $error);
+                    $f3->set('site_error', $error);
                 } else {
                     $this->Login($user);
-                    $this->f3->reroute('/');
+                    $f3->reroute('/');
                 }
             } else {
-                $this->f3->set('site_error', 'Passwords did not match');
+                $f3->set('site_error', 'Passwords did not match');
             }
 		}
 
@@ -55,7 +55,7 @@ class controller extends \Controller {
             $user->GenerateLoginToken();
         }
 
-        $this->f3->reroute('/');
+        $this->f3()->reroute('/');
     }
 
 }

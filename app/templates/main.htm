@@ -51,7 +51,7 @@
 									{{ @active_user->Data->display_name }}
 								</button>
 								<ul class="dropdown-menu dropdown-menu-dark">
-									<li><a class="dropdown-item" href="mods/user?user_id={{ @active_user->uid }}">My Mods</a></li>
+									<li><a class="dropdown-item" href="mods/user/{{ @active_user->uid }}">My Mods</a></li>
 									<li><a class="dropdown-item" href="auth/logout">Log Out</a></li>
 								</ul>
 							</div>

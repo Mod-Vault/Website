@@ -2,100 +2,96 @@
 namespace modules\mods;
 class controller extends \Controller {
 
-	function get() {
+	function list($f3, $params) {
 
-		$game_id = $_GET['game_id'];
+		$game_id = $params['resource_id'];
 		if(empty($game_id)) die('No game_id specified');
 
 		$game = new \Game($game_id, true);
 
-		$this->f3->set('game', $game);
+		$f3->set('game', $game);
 
-		echo $this->render('index');
+		echo $this->render('list');
 	}
 
-	function approve_file() {
+	function approve_file($f3) {
 
-		if(!$this->f3->active_user->IsAdmin) {
+		if(!$f3->active_user->IsAdmin) {
 			echo 'uh, no';
 			die();
 		}
 
 		$values = $_GET;
-		$file_data = $this->f3->db->row('SELECT mod_catalog_id, version, set_new_version_on_approval FROM mod_attached_files WHERE uid=?', [$values['id']]);
+		$file_data = $f3->db->row('SELECT mod_catalog_id, version, set_new_version_on_approval FROM mod_attached_files WHERE uid=?', [$values['id']]);
 
-		$this->f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
+		$f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
 
 		if($file_data['set_new_version_on_approval']) {
-			$this->f3->db->update('mod_catalog', ['current_version' => $file_data['version']], ['uid' => $file_data['mod_catalog_id']]);
+			$f3->db->update('mod_catalog', ['current_version' => $file_data['version']], ['uid' => $file_data['mod_catalog_id']]);
 		}
 
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
 	}
 
-	function details() {
+	function details($f3, $params) {
 
-		$mod_catalog_id = $_GET['uid'];
+		$mod_id = $params['resource_id'];
+		if(empty($mod_id)) die('No mod ID given...');
 
-		if(empty($mod_catalog_id)) die('No mod catalog ID given...');
+		$mod = new \Mod($mod_id, true);
+		$is_owner = $f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
 
-		$mod = new \Mod($mod_catalog_id, true);
-		$is_owner = $this->f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
-		$this->f3->set('mod', $mod);
-		$this->f3->set('is_owner', $is_owner);
+		$f3->set('mod', $mod);
+		$f3->set('is_owner', $is_owner);
 
-		if($this->f3->VERB == "POST") {
+		if($f3->VERB == "POST") {
 
 			$this->requires_account();
 
 			if($is_owner) {
-
 				$mod->Update($_POST);
-
-				$this->f3->reroute("/mods/details?uid={$mod_catalog_id}");
+				$f3->reroute("/mods/details/{$mod_id}");
 			} else {
 				die("You don't have permission to do that.");
 			}
 		}
 
 		if($is_owner) {
-			$this->f3->set('owner_data', $mod->GetRestrictedData());
+			$f3->set('owner_data', $mod->GetRestrictedData());
 		}
 
 		echo $this->render('details');
 		echo $this->render('details_modals', 'templates/blank');
 	}
 
-	function add() {
+	function add($f3) {
 
 		$this->requires_account();
 
-		if($this->f3->VERB == "POST") {
+		if($f3->VERB == "POST") {
 			$mod = new \Mod();
 			if(($error = $mod->Create($_POST)) !== true) {
-				$this->f3->set('site_error', $error);
+				$f3->set('site_error', $error);
 			} else {
 				if(!empty($_FILES['host_file']['size'])) {
 					$filehost = new \Filehost();
 					$filehost->UploadFile($mod->uid, $mod->Data->current_version, $_FILES['host_file'], 1);
 				}
 
-				$this->f3->reroute('/mods/details?uid=' . $mod->uid);
+				$f3->reroute('/mods/details?uid=' . $mod->uid);
 			}
 		}
 
 		$catalog = $this->model('Catalog', 'discover');
-		$this->f3->set('games', $catalog->get_games());
+		$f3->set('games', $catalog->get_games());
 
 		echo $this->render('add_mod');
 
 	}
 
-	function user() {
-
-		$this->f3->set('user', new \User($_GET['user_id'], true));
+	function user($f3, $params) {
+		$f3->set('user', new \User($params['resource_id'], true));
 		echo $this->render('user_mods');
-
 	}
 
 	function download() {

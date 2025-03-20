@@ -1,7 +1,7 @@
 <div class="card mt-3 border-secondary">
     <h3 class="card-header d-flex align-items-center">
         <div class="flex-fill">{{ @mod->Data->name }}</div>
-        <div class="fs-5">Author: <a target="_blank" href="mods/user?user_id={{ @mod->Data->owner }}">{{ @mod->Data->owner_name }}</a></div>
+        <div class="fs-5">Author: <a href="mods/user/{{ @mod->Data->owner }}">{{ @mod->Data->owner_name }}</a></div>
     </h3>
     <div class="card-body align-middle">
         <div class="mb-2">

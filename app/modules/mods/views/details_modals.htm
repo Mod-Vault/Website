@@ -74,7 +74,7 @@
                             <label>Changelog Version</label>
                             <select class="form-control" name="changelog_version">
                                 <repeat group="{{ @owner_data['all_versions'] }}" value="{{ @version }}">
-                                    <option value="{{ @version }}">{{ @version }}</option>
+                                    <option value="{{ @version }}" {{ @version == @mod->Data->current_version ? 'selected' : '' }}>{{ @version }}</option>
                                 </repeat>
                             </select>
                         </div>
@@ -157,7 +157,7 @@
                             <label>Changelog Version</label>
                             <select class="form-control" name="change_version">
                                 <repeat group="{{ @owner_data['all_versions'] }}" value="{{ @version }}">
-                                    <option value="{{ @version }}">{{ @version }}</option>
+                                    <option value="{{ @version }}" {{ @version == @mod->Data->current_version ? 'selected' : '' }}>{{ @version }}</option>
                                 </repeat>
                             </select>
                         </div>
