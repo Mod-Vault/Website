@@ -137,7 +137,7 @@
                                             Version {{ @version . (@version == @mod->Data->current_file->version ? ' (Current)' : '') }}
                                         </button>
                                     </h2>
-                                    <div id="v-{{ @version }}" class="accordion-collapse collapse {{ @version == @mod->Data->current_file->version ? 'show' : '' }}" data-bs-parent="#changelogs-accordion">
+                                    <div id="v-{{ @version }}" class="accordion-collapse collapse {{ !empty(@mod->Data->current_file) && @version == @mod->Data->current_file->version ? 'show' : '' }}" data-bs-parent="#changelogs-accordion">
                                         <div class="accordion-body">
                                             <ul class="mb-0">
                                                 <repeat group="{{ @logs }}" value="{{ @log }}">
