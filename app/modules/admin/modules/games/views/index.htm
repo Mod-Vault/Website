@@ -1,0 +1,39 @@
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header d-flex align-items-center">
+        <div class="flex-fill text-center">Games</div>
+        <a href="admin/games/edit" class="btn btn-primary">Create New Game</a>
+    </h3>
+    <div class="card-body p-0">
+        <div id="game_table"></div>
+    </div>
+</div>
+
+<script>
+    var table = new Tabulator("#game_table", {
+        ajaxURL: 'admin/games/get_tags',
+        layout: "fitData",
+        responsiveLayout: "hide",
+        initialSort: [             //set the initial sort order of the data
+            { column: "name", dir: "asc" },
+        ],
+        columns: [
+            {
+                title: '', headerSort: false, field: 'test', formatter: function (cell, formatterParams, onRendered) {
+                    var rowData = cell.getData();
+                    var uid = rowData.uid;
+
+                    return `<a href="admin/games/edit/${uid}" class="btn btn-primary">Open</a>`;
+                }
+            },
+            {
+                title: 'Game Link', headerSort: false, field: 'link',
+                formatter: function (cell, formatterParams, onRendered) {
+                    var rowData = cell.getData();
+                    return `<a target="_blank" href="${rowData.link}" class="btn btn-secondary">Open External Link</a>`;
+                }
+            },
+            { title: 'Name', field: 'name' },
+            { title: 'Description', field: 'description' }
+        ]
+    });
+</script>

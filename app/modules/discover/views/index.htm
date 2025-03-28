@@ -3,7 +3,7 @@
     <div class="card-body">
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <repeat group="{{ @games }}" value="{{ @game }}">
-                <a href="mods?game_id={{ @game['uid'] }}" class="col text-decoration-none">
+                <a href="mods/list/{{ @game['uid'] }}" class="col text-decoration-none">
                     <div class="card">
                         <img src="{{ @game['thumbnail'] }}" class="card-img-top">
                         <div class="card-body">

@@ -1,0 +1,23 @@
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header">{{ @game->Data->name }} Mods</h3>
+    <div class="card-body">
+
+        <set game_mods="{{ @game->GetMods() }}" />
+
+        <check if="{{ empty(@game_mods) }}">
+            <div class="alert alert-warning">There aren't any mods for this game yet.</div>
+        </check>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <repeat group="{{ @game_mods }}" value="{{ @mod }}">
+                <a href="mods/details/{{ @mod->uid }}" class="col text-decoration-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ @mod->name }}</h5>
+                            <p class="card-text">Author: {{ @mod->author }}</p>
+                        </div>
+                    </div>
+                </a>
+            </repeat>
+        </div>
+    </div>
+</div>

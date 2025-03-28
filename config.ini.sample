@@ -10,6 +10,9 @@ defaultTemplate = "templates/main"
 
 basePath = "/"
 
+;Image Uploading
+imgbb_api_key = "f745be818a7359ff8701c1e029eb8749"
+
 ; DATABASE SETUP
 db_host = "localhost"
 db_username = ""
@@ -18,6 +21,6 @@ db_database = ""
 
 DEBUG=3
 UI=app/modules/
-AUTOLOAD=app/|app/application/vendor/grumpypdo/
+AUTOLOAD=app/|app/application/vendor/grumpypdo/|app/application/classes/
 TEMP=app/application/tmp/
 ;*/

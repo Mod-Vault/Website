@@ -1,21 +1,26 @@
 <div class="d-flex align-items-center justify-content-center">
-    <form method="POST" style="width: 100%; max-width: 400px;">
-        <div class="mb-1 form-control-lg">
-            <label class="form-label">Username / Email</label>
-            <input type="text" class="form-control" name="user" placeholder="Username / Email">
+    <form method="POST" style="width: 100%; max-width: 400px;" class="card border-secondary">
+        <h2 class="card-header text-center">
+            Login
+        </h2>
+        <div class="card-body">
+            <div class="mb-2">
+                <label class="form-label">Username / Email</label>
+                <input type="text" class="form-control" name="user" placeholder="Username / Email">
+            </div>
+            <div class="mb-2">
+                <label for="loginInputPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <div>
+                <input type="hidden" class="form-check-input" name="keep_logged_in" value="0">
+                <input id="rememberCheck" type="checkbox" class="form-check-input" name="keep_logged_in" value="1">
+                <label class="form-check-label" for="rememberCheck">Keep me logged in</label>
+            </div>
         </div>
-        <div class="mb-1 form-control-lg">
-            <label for="loginInputPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" placeholder="Password">
-        </div>
-        <div class="mb-1 form-control-lg">
-            <input type="hidden" class="form-check-input" name="keep_logged_in" value="0">
-            <input id="rememberCheck" type="checkbox" class="form-check-input" name="keep_logged_in" value="1">
-            <label class="form-check-label" for="rememberCheck">Keep me logged in</label>
-        </div>
-        <div class="mb-1 form-control-lg">
+        <div class="card-footer">
             <button type="submit" class="btn btn-primary">Login</button>
-            <a href="auth/register" class="btn btn-secondary">Register</a>
+            <a href="auth/register" class="btn btn-secondary float-end">Register</a>
         </div>
     </form>
 </div>

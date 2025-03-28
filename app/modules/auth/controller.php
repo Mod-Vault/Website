@@ -6,48 +6,56 @@ class controller extends \Controller {
 		echo $this->render('index');
 	}
 
-    function post() {
-        $auth = $this->model('Auth');
-
-        $errors = $auth->attempt_login($_POST['user'], $_POST['password'], $_POST['keep_logged_in']);
-
-        if(empty($errors)) {
-            $this->f3->reroute('/');
+    function post($f3) {
+        $user = new \User();
+        if($user->GetUserByName($_POST['user']) && $user->ValidateCredentials($_POST['password'])) {
+            $this->Login($user, $_POST['keep_logged_in']);
+            return;
         } else {
-            $this->f3->set('site_error', $errors);
+            $f3->set('site_error', 'The login credentials that were entered are invalid');
         }
 
         $this->get();
     }
 
-    function logout() {
-		$this->f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$_SESSION['user']['uid']]);
+    function logout($f3) {
+		$f3->db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$f3->active_user->uid]);
         $_SESSION = [];
 		$_COOKIE['keep_me_logged_in'] = null;
-        $this->f3->reroute('/');
+        $f3->reroute('/');
     }
 
-    function register() {
-
-        if($this->f3->VERB == "POST") {
-
+    function register($f3) {
+        if($f3->VERB == "POST") {
             if($_POST['password'] == $_POST['password_verify']) {
-                $auth = $this->model('Auth');
-                $errors = $auth->create_account($_POST['display_name'], $_POST['email'], $_POST['password']);
 
-                if(empty($errors)) {
-                    $this->f3->reroute('/');
+                $user = new \User();
+                if(($error = $user->Create($_POST)) !== true) {
+                    $f3->set('site_error', $error);
                 } else {
-                    $this->f3->set('site_error', $errors);
+                    $this->Login($user);
+                    $f3->reroute('/');
                 }
-
             } else {
-                $this->f3->set('site_error', 'The passwords that you entered did not match.');
+                $f3->set('site_error', 'Passwords did not match');
             }
-
 		}
 
         echo $this->render('register');
+    }
+
+    private function Login(\User $user, bool $keep_logged_in = false) {
+        if(empty($user->uid)) return;
+
+        $user->GetData();
+
+        $_SESSION['user_id'] = $user->uid;
+
+        if($keep_logged_in) {
+            $user->GenerateLoginToken();
+        }
+
+        $this->f3()->reroute('/');
     }
 
 }

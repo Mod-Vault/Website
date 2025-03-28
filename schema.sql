@@ -5,7 +5,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `attached_file_status` (
   `uid` int(11) NOT NULL,
   `description` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `attached_file_status` (`uid`, `description`) VALUES
 (1, 'Pending'),
@@ -17,28 +17,28 @@ CREATE TABLE `games` (
   `uid` int(11) NOT NULL,
   `thumbnail` text NOT NULL,
   `name` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `mod_attached_files` (
 	`uid` INT(11) NOT NULL,
 	`mod_catalog_id` INT(11) NOT NULL,
 	`status` INT(11) NOT NULL DEFAULT '1',
-	`version` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
-	`path` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
-	`filename` VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
+	`version` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`path` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`filename` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`set_new_version_on_approval` TINYINT(1) NOT NULL DEFAULT '0',
-	`rejection_reason` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`rejection_reason` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`judged_timestamp` DATETIME NULL DEFAULT NULL,
-	`virustotal_analyses_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	`virustotal_analyses_id` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
 	`submitted_timestamp` DATETIME NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `mod_attached_links` (
   `uid` int(11) NOT NULL,
   `mod_catalog_id` int(11) NOT NULL,
   `href` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `mod_catalog` (
   `uid` int(11) NOT NULL,
@@ -48,14 +48,14 @@ CREATE TABLE `mod_catalog` (
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `current_version` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `mod_catalog_changelogs` (
   `uid` int(11) NOT NULL,
   `mod_catalog_id` int(11) NOT NULL,
   `version` varchar(255) NOT NULL,
   `log` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `users` (
   `uid` int(11) NOT NULL,
@@ -63,12 +63,12 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `is_admin` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `users_login_tokens` (
   `user_id` int(11) NOT NULL,
   `hash` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 ALTER TABLE `attached_file_status`
@@ -149,11 +149,33 @@ CREATE TABLE `mod_file_downloads` (
 	CONSTRAINT `FK__mod_attached_files` FOREIGN KEY (`mod_attached_file_id`) REFERENCES `mod_attached_files` (`uid`) ON UPDATE CASCADE ON DELETE CASCADE,
 	CONSTRAINT `FK__mod_catalog` FOREIGN KEY (`game_catalog_id`) REFERENCES `mod_catalog` (`uid`) ON UPDATE CASCADE ON DELETE CASCADE
 )
-COLLATE='latin1_swedish_ci'
+COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
 
+-- 03-16-2025
+ALTER TABLE `mod_attached_links`
+	ADD COLUMN `required` TINYINT NOT NULL DEFAULT 0 AFTER `description`;
 
+ALTER TABLE `mod_catalog_changelogs`
+	DROP FOREIGN KEY `mod_catalog_changelogs_ibfk_1`;
+ALTER TABLE `mod_catalog_changelogs`
+	ADD CONSTRAINT `mod_catalog_changelogs_ibfk_1` FOREIGN KEY (`mod_catalog_id`) REFERENCES `mod_catalog` (`uid`) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+-- 03-27-2025
+CREATE TABLE `tags` (
+	`uid` INT(11) NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`description` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`staff_notes` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`disabled` TINYINT(4) NOT NULL DEFAULT '0',
+	PRIMARY KEY (`uid`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+ALTER TABLE `games`
+	ADD COLUMN `description` VARCHAR(255) NULL DEFAULT NULL AFTER `name`,
+	ADD COLUMN `link` TEXT NULL DEFAULT NULL AFTER `description`;
 
 
 COMMIT;

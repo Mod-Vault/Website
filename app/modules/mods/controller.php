@@ -2,142 +2,96 @@
 namespace modules\mods;
 class controller extends \Controller {
 
-	function get() {
+	function list($f3, $params) {
 
-		$game_id = $_GET['game_id'];
+		$game_id = $params['resource_id'];
 		if(empty($game_id)) die('No game_id specified');
 
-		$mods = $this->model('Mods');
-		$catalog = $this->model('Catalog', 'discover');
+		$game = new \Game($game_id, true);
 
-		$this->f3->set('data', $mods->get_mods($game_id));
-		$this->f3->set('game_data', $catalog->get_game($game_id));
+		$f3->set('game', $game);
 
-		echo $this->render('index');
+		echo $this->render('list');
 	}
 
-	function approve_file() {
+	function approve_file($f3) {
 
-		if(!$this->f3->active_user_is_admin) {
+		if(!$f3->active_user->IsAdmin) {
 			echo 'uh, no';
 			die();
 		}
 
 		$values = $_GET;
-		$this->f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
+		$file_data = $f3->db->row('SELECT mod_catalog_id, version, set_new_version_on_approval FROM mod_attached_files WHERE uid=?', [$values['id']]);
+
+		$f3->db->update('mod_attached_files', ['status' => 4], ['uid' => $values['id']]);
+
+		if($file_data['set_new_version_on_approval']) {
+			$f3->db->update('mod_catalog', ['current_version' => $file_data['version']], ['uid' => $file_data['mod_catalog_id']]);
+		}
 
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
 	}
 
-	function details() {
+	function details($f3, $params) {
 
-		$mod_catalog_id = $_GET['uid'];
+		$mod_id = $params['resource_id'];
+		if(empty($mod_id)) die('No mod ID given...');
 
-		if(empty($mod_catalog_id)) die('No mod catalog ID given...');
+		$mod = new \Mod($mod_id, true);
+		$is_owner = $f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
 
-		$mods = $this->model('Mods');
+		$f3->set('mod', $mod);
+		$f3->set('is_owner', $is_owner);
 
-		$mod_info = $mods->get_mod($mod_catalog_id);
-		$is_owner = $mod_info['info']['owner'] == array_key_exists('user', $_SESSION) && ($_SESSION['user']['uid'] || $_SESSION['user']['is_admin']);
-
-		if($this->f3->VERB == "POST") {
+		if($f3->VERB == "POST") {
 
 			$this->requires_account();
 
 			if($is_owner) {
-
-				$update = [];
-
-				if(!empty($_POST['change_description'])) {
-					$update['description'] = $_POST['change_description'];
-				}
-
-				if(!empty($_POST['change_version'])) {
-					$update['current_version'] = $_POST['change_version'];
-				}
-
-				if(!empty($_POST['add_changelogs'])) {
-					$logs = array_values(array_filter(explode(PHP_EOL, $_POST['add_changelogs'])));
-					$mods->post_changelogs($mod_catalog_id, $_POST['version'], $logs);
-				}
-
-				if(!empty($_POST['update_type'])) {
-					switch($_POST['update_type']) {
-						case 'new_version_upload':
-							$filehost = $this->model('Filehost');
-							$filehost->upload_file($mod_catalog_id, $_POST['version'], $_FILES['host_file'], $_POST['set_current_version']);
-							break;
-						case 'edit_attached_links':
-							$link_file = array_key_exists('link_file', $_POST) ? $_POST['link_file'] : [];
-							$link_file_description = array_key_exists('link_file_description', $_POST) ? $_POST['link_file_description'] : [];
-							$mods->update_mod_links($mod_catalog_id, $link_file, $link_file_description);
-							break;
-					}
-				}
-
-				if(!empty($update)) {
-					$mods->update_mod($mod_catalog_id, $update);
-				}
-
-				$this->f3->reroute("/mods/details?uid={$mod_catalog_id}");
-
+				$mod->Update($_POST);
+				$f3->reroute("/mods/details/{$mod_id}");
 			} else {
 				die("You don't have permission to do that.");
 			}
-
 		}
 
-		$this->f3->set('data', $mod_info ?: $mods->get_mod($mod_catalog_id));
-		$this->f3->set('is_owner', $is_owner);
 		if($is_owner) {
-			$this->f3->set('owner_data', $mods->get_owner_data($mod_catalog_id));
+			$f3->set('owner_data', $mod->GetRestrictedData());
 		}
 
 		echo $this->render('details');
 		echo $this->render('details_modals', 'templates/blank');
 	}
 
-	function add() {
+	function add($f3) {
 
 		$this->requires_account();
 
-		if($this->f3->VERB == "POST") {
-
-			$mods = $this->model('Mods');
-			if(!$mods->does_mod_exist($_POST['game_id'], $_POST['name'])) {
-
-				$catalog_id = $mods->add_mod($_POST);
-
+		if($f3->VERB == "POST") {
+			$mod = new \Mod();
+			if(($error = $mod->Create($_POST)) !== true) {
+				$f3->set('site_error', $error);
+			} else {
 				if(!empty($_FILES['host_file']['size'])) {
-					$filehost = $this->model('Filehost');
-					$filehost->upload_file($catalog_id, $_POST['version'], $_FILES['host_file']);
+					$filehost = new \Filehost();
+					$filehost->UploadFile($mod->uid, $mod->Data->current_version, $_FILES['host_file'], 1);
 				}
 
-				$this->f3->reroute('/mods/user?user_id=' . $_SESSION['user']['uid']);
-			} else {
-				$this->f3->set('site_error', 'This mod with the same name already exists for this game.');
+				$f3->reroute('/mods/details/' . $mod->uid);
 			}
-
 		}
 
 		$catalog = $this->model('Catalog', 'discover');
-		$this->f3->set('games', $catalog->get_games());
+		$f3->set('games', $catalog->get_games());
 
 		echo $this->render('add_mod');
 
 	}
 
-	function user() {
-
-		//list uploaded mods by user by user_id
-		$user_id = $_GET['user_id'];
-
-		$mods = $this->model('Mods');
-
-		$this->f3->set('data', $mods->get_user($user_id));
-
+	function user($f3, $params) {
+		$f3->set('user', new \User($params['resource_id'], true));
 		echo $this->render('user_mods');
-
 	}
 
 	function download() {
@@ -145,8 +99,8 @@ class controller extends \Controller {
 		$file_id = $_GET['file_id'];
 		if(empty($file_id)) die('No File ID given...');
 
-		$filehost = $this->model('Filehost');
-		$mod_info = $filehost->get_file_info($file_id);
+		$filehost = new \Filehost();
+		$mod_info = $filehost->GetFileInfo($file_id);
 
 		//any status except for these will not be allowed to be downloaded
 		//status 4 is "Available"
@@ -181,7 +135,7 @@ class controller extends \Controller {
 		   	flush();
 		   	readfile($file);
 
-			$filehost->log_download($mod_info['uid'], $mod_info['mod_catalog_id']);
+			$filehost->LogDownload($mod_info['uid'], $mod_info['mod_catalog_id']);
 
 		   	exit;
 	   } else {

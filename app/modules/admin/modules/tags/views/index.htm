@@ -1,0 +1,33 @@
+<div class="card mt-3 border-secondary">
+    <h3 class="card-header d-flex align-items-center">
+        <div class="flex-fill text-center">Tags</div>
+        <a href="admin/tags/edit" class="btn btn-primary">Create New Tag</a>
+    </h3>
+    <div class="card-body p-0">
+        <div id="tag_table"></div>
+    </div>
+</div>
+
+<script>
+    var table = new Tabulator("#tag_table", {
+        ajaxURL: 'admin/tags/get_tags',
+        layout: "fitData",
+        responsiveLayout: "hide",
+        initialSort: [             //set the initial sort order of the data
+            { column: "name", dir: "asc" },
+        ],
+        columns: [
+            {
+                title: '', headerSort: false, field: 'test', formatter: function (cell, formatterParams, onRendered) {
+                    var rowData = cell.getData();
+                    var uid = rowData.uid;
+
+                    return `<a href="admin/tags/edit/${uid}" class="btn btn-primary">Open</a>`;
+                }
+            },
+            { title: 'Name', field: 'name' },
+            { title: 'Description', field: 'description' },
+            { title: 'Staff Notes', field: 'staff_notes' }
+        ]
+    });
+</script>

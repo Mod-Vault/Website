@@ -2,11 +2,11 @@
 namespace modules\discover;
 class controller extends \Controller {
 
-	function get() {
+	function get($f3) {
 
 		$catalog = $this->model('Catalog');
 
-		$this->f3->set('games', $catalog->get_games());
+		$f3->set('games', $catalog->get_games());
 
 		echo $this->render('index');
 	}

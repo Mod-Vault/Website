@@ -33,32 +33,28 @@ $db = new GrumpyPDO($f3->get('db_host'), $f3->get('db_username'), $f3->get('db_p
 $f3->set('db', $db);
 
 $f3->set('active_user_is_admin', false);
-if(array_key_exists('user', $_SESSION)) $f3->set('active_user_is_admin', $_SESSION['user']['is_admin']);
-
-if(empty($_SESSION['user']) && !empty($_COOKIE['keep_me_logged_in'])) {
+$generate_new_login_token = false;
+if(!array_key_exists('user_id', $_SESSION) && !empty($_COOKIE['keep_me_logged_in'])) {
     $token_details = json_decode($_COOKIE['keep_me_logged_in'], true);
 
     if($token = $db->row("SELECT user_id, hash FROM users_login_tokens WHERE user_id=?", [$token_details['user_id']])) {
         if(password_verify($token_details['hash'], $token['hash'])) {
-            $user = $db->row('SELECT * FROM users WHERE uid=?', [$token['user_id']]);
-
-            unset($user['password']);
-            $_SESSION['user'] = $user;
-
-            $token = [
-                'user_id' => $_SESSION['user']['uid'],
-                'hash' => bin2hex(random_bytes(32))
-            ];
-
-            $token_hashed = $token;
-            $token_hashed['hash'] = password_hash($token_hashed['hash'], PASSWORD_DEFAULT);
-
-            $db->run("DELETE FROM users_login_tokens WHERE user_id=?", [$token['user_id']]);
-            $db->insert('users_login_tokens', $token_hashed);
-            setcookie("keep_me_logged_in", json_encode($token));
+            $_SESSION['user_id'] = $token['user_id'];
+            $generate_new_login_token = true;
         }
     }
 }
+if(array_key_exists('user_id', $_SESSION)) {
+    $f3->set('active_user', $user = new User($_SESSION['user_id'], true));
+    $f3->set('active_user_is_admin', $user->IsAdmin);
+
+    if($generate_new_login_token) {
+        $user->GenerateLoginToken();
+    }
+} else {
+    $f3->set('active_user', new User());
+}
+
 
 //die("<pre>" . print_r($f3,true) . "</pre>");
 

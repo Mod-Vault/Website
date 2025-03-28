@@ -9,7 +9,7 @@
         <div class="card mt-3 border-secondary">
             <h3 class="card-header d-flex align-items-center">
                 <div class="flex-fill">Add New Mod</div>
-                <button id="submit_button" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary submit_button">Submit</button>
             </h3>
 
             <div class="card-body">
@@ -29,8 +29,8 @@
                             <input type="text" class="form-control" name="name" maxlength="35" />
                         </div>
                         <div class="mb-1">
-                            <label>Version</label>
-                            <input type="text" class="form-control" name="version" maxlength="15" />
+                            <label>Current Version</label>
+                            <input type="text" class="form-control" name="current_version" maxlength="15" />
                         </div>
                     </div>
                     <div class="col">
@@ -68,12 +68,9 @@
                     <div id="external_link_container" class="mb-2"></div>
                     
                 </div>
-
-                <div class="mb-1 card">
-                    <div class="card-body p-2">
-                        <button id="submit_button" type="button" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-primary submit_button">Submit</button>
             </div>
         </div>
     </form>
@@ -82,7 +79,7 @@
 <script>
     $(document).ready(function() {
 
-        $('#submit_button').on('click', function(e) {
+        $('.submit_button').on('click', function(e) {
             var md = editor.getMarkdown();
             console.log(md);
 
@@ -90,7 +87,6 @@
 
             $('#description').val(md);
 
-            return;
             $('#add_mod_form').submit();
         });
 
@@ -111,11 +107,24 @@
                     <div class="col">
                         <input type="url" name="link_file[]" class="form-control" placeholder="Link to External Site" required/>
                     </div>
+                    <div class="col-2 card">
+                        <div class="card-body p-1 text-center">
+                            <input type="hidden" name="required[]" value="0" checked class="form-checkbox disable_cb_pair other"/>
+                            <input type="checkbox" name="required[]" value="1" class="form-checkbox disable_cb_pair"/> Required
+                        </div>
+                    </div>
                     <div class="col">
                         <button type="button" onclick="$(this).parent().parent().remove()" class="btn btn-warning">Remove Link</button>
                     </div>
                 </div>
             `);
+
+            $(document).on('change', '.disable_cb_pair', function () {
+                var p = $(this).parent();
+                var other_cb = p.find('.disable_cb_pair.other');
+
+                other_cb.prop('disabled', this.checked);
+            });
         });
 
     });
