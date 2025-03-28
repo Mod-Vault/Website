@@ -11,7 +11,7 @@ defaultTemplate = "templates/main"
 basePath = "/"
 
 ;Image Uploading
-imgbb_api_key = "f745be818a7359ff8701c1e029eb8749"
+imgbb_api_key = ""
 
 ; DATABASE SETUP
 db_host = "localhost"

@@ -39,7 +39,7 @@ class controller extends \Controller {
 		if(empty($mod_id)) die('No mod ID given...');
 
 		$mod = new \Mod($mod_id, true);
-		$is_owner = $f3->active_user->IsUser($mod->Data->owner) || $this->f3->active_user->IsAdmin;
+		$is_owner = $f3->active_user->IsUser($mod->Data->owner) || $f3->active_user->IsAdmin;
 
 		$f3->set('mod', $mod);
 		$f3->set('is_owner', $is_owner);
