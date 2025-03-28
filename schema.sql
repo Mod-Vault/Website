@@ -161,4 +161,21 @@ ALTER TABLE `mod_catalog_changelogs`
 ALTER TABLE `mod_catalog_changelogs`
 	ADD CONSTRAINT `mod_catalog_changelogs_ibfk_1` FOREIGN KEY (`mod_catalog_id`) REFERENCES `mod_catalog` (`uid`) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+-- 03-27-2025
+CREATE TABLE `tags` (
+	`uid` INT(11) NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`description` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`staff_notes` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci',
+	`disabled` TINYINT(4) NOT NULL DEFAULT '0',
+	PRIMARY KEY (`uid`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+ALTER TABLE `games`
+	ADD COLUMN `description` VARCHAR(255) NULL DEFAULT NULL AFTER `name`,
+	ADD COLUMN `link` TEXT NULL DEFAULT NULL AFTER `description`;
+
+
 COMMIT;

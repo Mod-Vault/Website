@@ -1,0 +1,27 @@
+<set tag_exists="{{ !empty(@tag->Data) }}"/>
+<div class="d-flex align-items-center justify-content-center">
+    <form method="POST" style="width: 100%; max-width: 800px;" class="card border-secondary">
+        <h3 class="card-header d-flex align-items-center">
+            <a href="admin/tags" class="btn btn-secondary float-end">Back to Tags</a>
+            <div class="flex-fill text-center">{{ @tag_exists ? 'Edit' : 'Create' }} Tag</div>
+            <button type="submit" class="btn btn-primary">{{ @tag_exists ? 'Update' : 'Create' }}</button>
+        </h3>
+        <div class="card-body">
+            <div class="mb-2">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Name" value="{{ @tag_exists ? @tag->Data->name : '' }}">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Description</label>
+                <textarea  rows="5"class="form-control" name="description">{{ @tag_exists ? @tag->Data->description : '' }}</textarea>
+            </div>
+            <div>
+                <label class="form-label">Staff Notes</label>
+                <textarea  rows="5"class="form-control" name="staff_notes">{{ @tag_exists ? @tag->Data->staff_notes : '' }}</textarea>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">{{ @tag_exists ? 'Update' : 'Create' }}</button>
+        </div>
+    </form>
+</div>

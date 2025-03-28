@@ -78,7 +78,7 @@ class controller extends \Controller {
 					$filehost->UploadFile($mod->uid, $mod->Data->current_version, $_FILES['host_file'], 1);
 				}
 
-				$f3->reroute('/mods/details?uid=' . $mod->uid);
+				$f3->reroute('/mods/details/' . $mod->uid);
 			}
 		}
 
