@@ -1,7 +1,7 @@
 <set game_exists="{{ !empty(@game->Data) }}" />
 <div class="d-flex align-items-center justify-content-center">
 
-    <form method="POST" enctype="application/json" style="width: 100%; max-width: 800px;" >
+    <form method="POST" enctype="multipart/form-data" style="width: 100%; max-width: 800px;" >
         <div class="card mt-3 mb-3 border-secondary">
             <h3 class="card-header d-flex align-items-center">
                 <a href="admin/games" class="btn btn-secondary float-end">Back to Games</a>
@@ -13,23 +13,35 @@
                     <div class="col">
                         <div>
                             <label>Name</label>
-                            <input type="text" class="form-control" name="name" placeholder="Name">
+                            <input type="text" class="form-control" name="name" placeholder="Name" value="{{ @game_exists ? @game->Data->name : '' }}">
                         </div>
                     </div>
                     <div class="col">
                         <div>
+                            <check if="{{ @game_exists && !empty(@game->Data->link) }}">
+                                <a target="_blank" class="badge bg-primary float-end" href="{{ @game->Data->link }}">Open External Link</a>
+                            </check>
                             <label>Link</label>
-                            <input type="text" class="form-control" name="link" placeholder="Link">
+                            <input type="text" class="form-control" name="link" placeholder="Link" value="{{ @game_exists ? @game->Data->link : '' }}">
                         </div>
                     </div>
                 </div>
                 <div class="mb-2">
                     <label>Description</label>
-                    <input type="text" class="form-control" name="description" placeholder="Description">
+                    <input type="text" class="form-control" name="description" placeholder="Description" value="{{ @game_exists ? @game->Data->description : '' }}">
                 </div>
                 <div class="mb-1 p-2 card card-body">
-                    <label>Image</label>
-                    <input type="file" class="form-control" name="thumbnail" placeholder="Image">
+                    <div class="row">
+                        <div class="col">
+                            <label>Image</label>
+                            <input type="file" class="form-control" name="thumbnail" placeholder="Image">
+                        </div>
+                        <check if="{{ @game_exists && !empty(@game->Data->thumbnail) }}">
+                            <div class="col">
+                                <img src="{{ @game->Data->thumbnail }}"/>
+                            </div>
+                        </check>
+                    </div>
                 </div>
             </div>
             <div class="card-footer">
