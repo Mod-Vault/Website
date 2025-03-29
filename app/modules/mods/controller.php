@@ -82,8 +82,7 @@ class controller extends \Controller {
 			}
 		}
 
-		$catalog = $this->model('Catalog', 'discover');
-		$f3->set('games', $catalog->get_games());
+		$f3->set('games', (new \Game())->GetGames());
 
 		echo $this->render('add_mod');
 

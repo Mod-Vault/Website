@@ -44,12 +44,14 @@ class User extends DBEntity {
 
         $values = $this->CleanData($data, ['display_name', 'email', 'password']);
 
+        if(!array_key_exists('email', $values)) $values['email'] = '';
         $user_exists = $this->db->column('SELECT uid FROM users WHERE display_name=? OR email=? AND email IS NOT NULL', [$values['display_name'], $values['email']]);
 
         if(!empty($user_exists)) {
             return 'The specified username or email is already in use.';
         }
 
+        if($values['email'] == '') unset($values['email']);
         $values['password'] = password_hash($values['password'], PASSWORD_DEFAULT);
 
         $this->db->insert('users', $values);
@@ -75,7 +77,7 @@ class User extends DBEntity {
 
         $sorted_mods = [];
         foreach($all_mods as $mod) {
-            if(!array_key_exists('game_id', $sorted_mods)) {
+            if(!array_key_exists($mod['game_id'], $sorted_mods)) {
                 $sorted_mods[$mod['game_id']] = [
                     'game_name' => $mod['game_name']
                 ];
@@ -103,6 +105,6 @@ class User extends DBEntity {
             WHERE
                 uid=?
         ', [$this->uid]);
-        $this->IsAdmin = $this->Data->is_admin;
+        $this->IsAdmin = $this->Data->is_admin == "1";
     }
 }

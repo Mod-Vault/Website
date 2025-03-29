@@ -177,5 +177,9 @@ ALTER TABLE `games`
 	ADD COLUMN `description` VARCHAR(255) NULL DEFAULT NULL AFTER `name`,
 	ADD COLUMN `link` TEXT NULL DEFAULT NULL AFTER `description`;
 
+-- 03-29-2025
+ALTER TABLE `users`
+	CHANGE COLUMN `email` `email` VARCHAR(255) NULL COLLATE 'utf8mb4_general_ci' AFTER `display_name`;
+
 
 COMMIT;

@@ -26,17 +26,17 @@
                         </div>
                         <div class="mb-1">
                             <label>Name</label>
-                            <input type="text" class="form-control" name="name" maxlength="35" />
+                            <input type="text" required class="form-control" name="name" maxlength="35" />
                         </div>
                         <div class="mb-1">
                             <label>Current Version</label>
-                            <input type="text" class="form-control" name="current_version" maxlength="15" />
+                            <input type="text" required class="form-control" name="current_version" maxlength="15" />
                         </div>
                     </div>
                     <div class="col">
                         <div class="mb-1">
                             <label>Changelogs (one per line)</label>
-                            <textarea style="height: 171px" name="add_changelogs" class="form-control"
+                            <textarea required style="height: 171px" name="add_changelogs" class="form-control"
                                 placeholder="Enter a change log, each line is a new entry for the selected version."></textarea>
                         </div>
                     </div>
@@ -87,7 +87,11 @@
 
             $('#description').val(md);
 
-            $('#add_mod_form').submit();
+            if ($('#add_mod_form')[0].checkValidity()) {
+                $('#add_mod_form').submit();
+            } else {
+                $('#add_mod_form')[0].reportValidity();
+            }
         });
 
         $('#add_link').on('click', function() {

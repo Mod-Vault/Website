@@ -1,13 +1,18 @@
 <div class="card mt-3 border-secondary">
-    <h3 class="card-header">Games</h3>
+    <h3 class="card-header d-flex align-items-center">
+        <div class="flex-fill">Games</div>
+        <input id="game_search" type="text" class="form-control w-25" placeholder="Search"/>
+    </h3>
     <div class="card-body">
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <repeat group="{{ @games }}" value="{{ @game }}">
-                <a href="mods/list/{{ @game['uid'] }}" class="col text-decoration-none">
-                    <div class="card">
-                        <img src="{{ @game['thumbnail'] }}" class="card-img-top">
+                <a href="mods/list/{{ @game['uid'] }}" class="col text-decoration-none game-card">
+                    <div class="card border-secondary h-100">
+                        <img height="200px" width="auto" src="{{ @game['thumbnail'] }}" class="card-img-top">
                         <div class="card-body">
+                            <p class="float-end badge bg-primary">{{ @game['mod_count'] }} Mod{{ @game['mod_count'] > 1 ? 's' : '' }}</p>
                             <h5 class="card-title">{{ @game['name'] }}</h5>
+                            <p class="card-text">{{ @game['description'] }}</p>
                         </div>
                     </div>
                 </a>
@@ -15,4 +20,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('#game_search').on('keyup', function () {
+            let searchText = $(this).val().toLowerCase(); // Get user input and convert to lowercase
+
+            $('.game-card').each(function () {
+                let title = $(this).find('.card-title').text().toLowerCase(); // Get the card title text
+                $(this).toggle(title.includes(searchText)); // Show if matches, hide if not
+            });
+        });
+    });
+</script>
 

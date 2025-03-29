@@ -32,7 +32,8 @@ class Mod extends DBEntity {
                 $filehost->UploadFile($this->uid, $values['changelog_version'], $_FILES['host_file'], $values['set_current_version']);
                 break;
             case 'edit_attached_links':
-                $this->UpdateModLinks($values['link_file']);
+                if(array_key_exists('link_file', $values))
+                    $this->UpdateModLinks($values['link_file']);
                 break;
         }
 
@@ -60,16 +61,21 @@ class Mod extends DBEntity {
         }
 
         $changelogs = $values['add_changelogs'];
-        $mod_links = $values['link_file'];
+        $mod_links = array_key_exists('link_file', $values) ? $values['link_file'] : [];
         unset($values['link_file']);
         unset($values['add_changelogs']);
+
+        $f3 = Base::instance();
+
+        $values['owner'] = $f3->active_user->uid;
 
         $this->db->insert('mod_catalog', $values);
         $this->uid = $this->db->lastInsertId();
 
         $this->Update([
             'link_file' => $mod_links,
-            'add_changelogs' => $changelogs
+            'add_changelogs' => $changelogs,
+            'changelog_version' => $values['current_version']
         ]);
 
         $this->GetData();

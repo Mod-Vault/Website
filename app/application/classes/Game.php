@@ -90,9 +90,12 @@ class Game extends DBEntity {
     function GetGames() {
         return (object)$this->db->all('
             SELECT
-                *
+                games.*,
+                COUNT(mc.uid) as mod_count
             FROM
                 games
+            LEFT JOIN mod_catalog mc ON mc.game_id=games.uid
+            GROUP BY games.uid
         ');
     }
 }
