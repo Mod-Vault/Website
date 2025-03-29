@@ -85,6 +85,15 @@
 			</check>
 			<include href="{{ @content }}" />
 		</div>
+		<div id="footer_spacer"></div>
+		<footer id="site_footer" class="py-2 bg-secondary w-100 position-fixed bottom-0 start-50 translate-middle-x">
+			<div class="container">
+				<div class="float-end d-flex">
+					<a href="discover/terms" class="text-light me-3 text-decoration-none">Terms of Service</a>
+					<a href="discover/privacy" class="text-light text-decoration-none">Privacy Policy</a>
+				</div>
+			</div>
+		</footer>
 	</body>
 
 </html>
@@ -92,6 +101,7 @@
 <script>
 	function adjustContainerHeight() {
 		$('#site_main_container').css('margin-top', $('#site_main_menu').outerHeight() + 15);
+		$('#footer_spacer').css('height', $('#site_footer').outerHeight());
 	}
 
 	$(document).ready(adjustContainerHeight);
